@@ -12,6 +12,11 @@
   * This software is licensed under terms that can be found in the LICENSE file
   * in the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
+  *이거 LED_Set_Brightness_10kHz(BRIGHTNESS_30); --> 여기서 BRIGHTNESS 조정 가능함,
+  *LED_Brightness_CTRL.h 들어가서 거기 값 바꿔가면 밝기가 바뀜. 일단 최대 밝기 테스트하려면
+  *BRIGHTNESS_DC_MAX 이거 쓰셈.
+  *그리고 현재 각 주파수 10초 동작 검증하기 위해 num_steps 를 1로 하고
+  *target_freqs[8] 여기 안에 0, 1, 2, .... , 8 까지 써서 각 주파수 검증해봤는데 이상 없음.
   *
   ******************************************************************************
   */
@@ -106,28 +111,28 @@ int main(void)
   // 1. 스톱워치용 타이머(TIM7) 켜기
   HAL_TIM_Base_Start(&htim7);
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET); // LED 5V ON
-  LED_Set_Brightness_10kHz(BRIGHTNESS_30); // 밝기 설정
-//    LED_Set_Brightness_10kHz(BRIGHTNESS_DC_MAX); // 밝기 설정
+//  LED_Set_Brightness_10kHz(BRIGHTNESS_30); // 밝기 설정
+    LED_Set_Brightness_10kHz(BRIGHTNESS_DC_MAX); // 최대 밝기 설정 -->LED 최대밝기테스트
  	HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
-
+ 	HAL_Delay(3000);
   uint32_t target_freqs[] = {1, 3, 5, 10, 13, 15, 20, 25, 30};
 //  int num_steps = sizeof(target_freqs) / sizeof(target_freqs[0]);
     int num_steps = 1; // 한개의 주파수만 테스트 코드 1번 , 원래는 ↑ 살릴 것
     // ====================================================
     // [실행] 배열을 훑으면서 순차적으로 실행
     // ====================================================
-    for (int i = 0; i < num_steps; i++)
-    {
-//        uint32_t current_freq = target_freqs[i];
-        // "현재 주파수로 10초간 동작해라"
-    	uint32_t current_freq = target_freqs[8]; //한개의 주파수만 테스트 코드 2번 , 원래는 ↑ 살릴 것. [0], [1], [2], ...., [8] 테스트 진행
-        Run_Photic_Sequence(current_freq, 10);
-
-        // (선택사항) 주파수 바뀌기 전에 2초 정도 쉴까? (Rest Time)
-        // 그전에 printf 로 uart 로 상태 출력하면서 겸사겸사 쉬자...
-  	  printf("hello \r\n");
-        HAL_Delay(2000);
-    }
+//    for (int i = 0; i < num_steps; i++)
+//    {
+////        uint32_t current_freq = target_freqs[i];
+//        // "현재 주파수로 10초간 동작해라"
+//    	uint32_t current_freq = target_freqs[8]; //한개의 주파수만 테스트 코드 2번 , 원래는 ↑ 살릴 것. [0], [1], [2], ...., [8] 테스트 진행
+//        Run_Photic_Sequence(current_freq, 10);
+//
+//        // (선택사항) 주파수 바뀌기 전에 2초 정도 쉴까? (Rest Time)
+//        // 그전에 printf 로 uart 로 상태 출력하면서 겸사겸사 쉬자...
+//  	  printf("hello \r\n");
+//        HAL_Delay(2000);
+//    }
 
 //          uint32_t current_freq = target_freqs[1];
 //
