@@ -71,7 +71,7 @@ void Error_Handler(void);
 #define LED_PWM_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-
+void USB_CDC_RxHandler(uint8_t*, uint32_t);
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

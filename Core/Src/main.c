@@ -50,7 +50,8 @@ TIM_HandleTypeDef htim7;
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
-
+// 'volatile'은 "이 변수는 인터럽트에서 갑자기 바뀔 수 있으니 최적화하지 마!"라는 뜻입니다.
+volatile uint8_t led_flag = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -67,7 +68,7 @@ void Run_Photic_Sequence(uint32_t freq_hz, uint32_t duration_sec);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-int usbcdc = 0;
+
 /* USER CODE END 0 */
 
 /**
@@ -109,36 +110,37 @@ int main(void)
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET); // LED 5V ON
   LED_Set_Brightness_10kHz(BRIGHTNESS_30); // 밝기 설정
 //    LED_Set_Brightness_10kHz(BRIGHTNESS_DC_MAX); // 밝기 설정
- 	HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
-
-  uint32_t target_freqs[] = {1, 3, 5, 10, 13, 15, 20, 25, 30};
-//  int num_steps = sizeof(target_freqs) / sizeof(target_freqs[0]);
-    int num_steps = 1; // 한개의 주파수만 테스트 코드 1번 , 원래는 ↑ 살릴 것
-    // ====================================================
-    // [실행] 배열을 훑으면서 순차적으로 실행
-    // ====================================================
-    for (int i = 0; i < num_steps; i++)
-    {
-//        uint32_t current_freq = target_freqs[i];
-        // "현재 주파수로 10초간 동작해라"
-    	uint32_t current_freq = target_freqs[8]; //한개의 주파수만 테스트 코드 2번 , 원래는 ↑ 살릴 것. [0], [1], [2], ...., [8] 테스트 진행
-        Run_Photic_Sequence(current_freq, 10);
-
-        // (선택사항) 주파수 바뀌기 전에 2초 정도 쉴까? (Rest Time)
-        // 그전에 printf 로 uart 로 상태 출력하면서 겸사겸사 쉬자...
-  	  printf("hello \r\n");
-        HAL_Delay(2000);
-    }
-
-//          uint32_t current_freq = target_freqs[1];
+// 	HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
 //
-//          // "현재 주파수로 10초간 동작해라"
-//          Run_Photic_Sequence(current_freq, 10);
-//          HAL_Delay(2000);
+//  uint32_t target_freqs[] = {1, 3, 5, 10, 13, 15, 20, 25, 30};
+//  int num_steps = sizeof(target_freqs) / sizeof(target_freqs[0]);
+////    int num_steps = 1; // 한개의 주파수만 테스트 코드 1번 , 원래는 ↑ 살릴 것
+//    // ====================================================
+//    // [실행] 배열을 훑으면서 순차적으로 실행
+//    // ====================================================
+//    for (int i = 0; i < num_steps; i++)
+//    {
+//        uint32_t current_freq = target_freqs[i];
+////         "현재 주파수로 10초간 동작해라"
+////    	uint32_t current_freq = target_freqs[8]; //한개의 주파수만 테스트 코드 2번 , 원래는 ↑ 살릴 것. [0], [1], [2], ...., [8] 테스트 진행
+//        Run_Photic_Sequence(current_freq, 10);
+//
+//        // (선택사항) 주파수 바뀌기 전에 2초 정도 쉴까? (Rest Time)
+//        // 그전에 printf 로 uart 로 상태 출력하면서 겸사겸사 쉬자...
+//  	  printf("hello \r\n");
+//        HAL_Delay(2000);
+//    }
+//
+////          uint32_t current_freq = target_freqs[1];
+////
+////          // "현재 주파수로 10초간 동작해라"
+////          Run_Photic_Sequence(current_freq, 10);
+////          HAL_Delay(2000);
+//
+//    // 모든 코스가 끝나면 안전하게 끄기
+//      HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);
+//      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
 
-    // 모든 코스가 끝나면 안전하게 끄기
-      HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -146,10 +148,24 @@ int main(void)
 
   while (1)
   {
-//	  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
-//	  Delay_us(10000);
-//	  HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);
-//	  HAL_Delay(990);
+	  if (led_flag == 1)
+	        {
+	            // 1. PWM 시작! (불 켜기)
+	            HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
+
+	            // 2. "켰습니다!" 라고 PC에 답장 보내기 (선택사항)
+	            char msg[] = "OK! PWM ON for 1 sec\n\r";
+	            CDC_Transmit_FS((uint8_t*)msg, strlen(msg));
+
+	            // 3. 1초 대기 (이제 여기서는 안전함)
+	            HAL_Delay(1000);
+
+	            // 4. PWM 정지! (불 끄기)
+	            HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);
+
+	            // 5. 깃발 내리기 (중요! 안 내리면 무한 반복됨)
+	            led_flag = 0;
+	        }
   }
     /* USER CODE END WHILE */
 
@@ -422,6 +438,17 @@ int _write(int file, char *ptr, int len)
 //	USB CDC 로 송신하는 코드
 	CDC_Transmit_FS((uint8_t*) ptr, len); return len;
 }
+
+void USB_CDC_RxHandler(uint8_t* Buf, uint32_t Len)
+{
+    // 1. "LED_ON" 6글자가 맞는지 확인
+    if (Len >= 6 && strncmp((char*)Buf, "LED_ON", 6) == 0)
+    {
+        // 2. 맞으면 깃발을 1로 세팅하고 끝!
+        led_flag = 1;
+    }
+}
+
 
 /* USER CODE END 4 */
 

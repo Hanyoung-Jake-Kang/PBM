@@ -263,6 +263,11 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   /* USER CODE BEGIN 6 */
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+//	 ▼▼▼ 우리가 추가한 부분 ▼▼▼
+	USB_CDC_RxHandler(UserRxBufferFS, *Len); // "거실(main.c)로 데이터 토스!"
+	memset(UserRxBufferFS, '\0', *Len);      // "버퍼 청소"
+//	 ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
   return (USBD_OK);
   /* USER CODE END 6 */
 }
