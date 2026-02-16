@@ -67,7 +67,7 @@ void Run_Photic_Sequence(uint32_t freq_hz, uint32_t duration_sec);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+int usbcdc = 0;
 /* USER CODE END 0 */
 
 /**
