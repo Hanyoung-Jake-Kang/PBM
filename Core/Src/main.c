@@ -13,7 +13,7 @@
   * in the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
   *
-  *This code is meant to test the USB CDC connection!!
+  *HOT FIX -- POLLING METHOD
   ******************************************************************************
   */
 /* USER CODE END Header */
