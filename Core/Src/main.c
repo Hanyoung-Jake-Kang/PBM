@@ -13,7 +13,7 @@
   * in the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
   *
-  *HOT FIX -- POLLING METHOD
+  *First appropriate communication with pc software made by hanyoung kang
   ******************************************************************************
   */
 /* USER CODE END Header */
