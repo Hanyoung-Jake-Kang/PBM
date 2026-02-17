@@ -50,27 +50,36 @@ TIM_HandleTypeDef htim7;
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
-// 'volatile'은 "이 변수는 인터럽트에서 갑자기 바뀔 수 있으니 최적화하지 마!"라는 뜻입니다.
-// 1. USB 통신용 변수
-volatile uint8_t usb_data_received = 0; // 데이터 도착 알림 깃발
-char rx_cmd_buffer[64];                 // [누락된 변수 1] 명령어 저장소
+// 1. USB 통신용
+volatile uint8_t usb_data_received = 0;
+uint8_t rx_buffer[64]; // 수신 버퍼 (Raw Data)
 
-// 2. Heartbeat용 변수
-uint32_t last_heartbeat_tick = 0;       // [누락된 변수 2] 마지막 심장박동 시간
+// 2. Heartbeat & Safety
+uint32_t last_hb_received_tick = 0; // 마지막으로 Host 연락 받은 시간
 
-// 3. Photic Stimulator (LED 제어) 구조체 정의
+// 3. Photic Stimulator 구조체 (확장됨)
 typedef struct {
-    uint8_t is_running;       // 작동 중인가?
+    uint8_t is_running;       // 동작 중? (1:ON, 0:OFF)
     uint32_t freq_hz;         // 주파수
-    uint32_t start_tick;      // 시작 시간
-    uint32_t duration_ms;     // 총 동작 시간
-    uint32_t last_toggle_tick;// 마지막 깜빡임 시간
-    uint32_t period_ms;       // 주기
-    uint32_t on_time_ms;      // 켜짐 시간 (10ms)
-    uint8_t led_state;        // LED 상태 (ON/OFF)
+    uint32_t intensity;       // [NEW] 빛 세기 (1~10)
+    uint32_t flash_duration;  // [NEW] 점등 시간 (ms)
+
+    uint32_t start_tick;
+    uint32_t duration_ms;
+    uint32_t last_toggle_tick;
+    uint32_t period_ms;
+    uint8_t led_state;
+
+    uint8_t error_code;       // [NEW] 에러 코드 (0:정상, 1:타임아웃 등)
+    uint8_t ext_trig_state;   // [NEW] PA8 핀 상태
 } PhoticStimulator_t;
 
-PhoticStimulator_t photic = {0}; // 구조체 변수 생성
+PhoticStimulator_t photic = {0};
+
+// 상수 정의 (프로토콜 규격)
+#define SOP 0x1C
+#define EOP 0x0D
+#define CMD_HEARTBEAT 0x68
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -136,84 +145,29 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
+  last_hb_received_tick = HAL_GetTick();
   while (1)
   {
-//	  if (led_flag == 1)
-//	        {
-//	            // 1. PWM 시작! (불 켜기)
-//	            HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
-//
-//	            // 2. "켰습니다!" 라고 PC에 답장 보내기 (선택사항)
-//	            char msg[] = "OK! PWM ON for 1 sec\n\r";
-//	            CDC_Transmit_FS((uint8_t*)msg, strlen(msg));
-//
-//	            // 3. 1초 대기 (이제 여기서는 안전함)
-//	            HAL_Delay(1000);
-//
-//	            // 4. PWM 정지! (불 끄기)
-//	            HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);
-//
-//	            // 5. 깃발 내리기 (중요! 안 내리면 무한 반복됨)
-//	            led_flag = 0;
-//	        }
-//	  // [Task 1] USB 데이터 처리
-//	      if (usb_data_received == 1) { // 깃발이 들려있으면?
-//
-//	          // 1. 할 일을 합니다 (예: 데이터 해석, 모드 변경)
-//	          // Process_Heartbeat_Packet();
-//
-//	          // 2. 중요! 일을 다 했으니 깃발을 내립니다.
-//	          usb_data_received = 0;
-//	      }
-//
-//	      // [Task 2] LED 제어 (논블로킹 함수 호출)
-//	      // 아까 만든 그 함수입니다. 계속 호출해줘야 시간이 되면 켜지고 꺼집니다.
-//	      Update_Photic_Sequence();
 	  uint32_t current_time = HAL_GetTick();
 
-	        // ==========================================
-	        // [Task 1] USB 명령어 처리 (깃발 확인)
-	        // ==========================================
-	        if (usb_data_received == 1)
-	        {
-	            // 1. "LED_ON" 명령어가 왔는지 확인 (6글자 비교)
-	            if (strncmp(rx_cmd_buffer, "LED_ON", 6) == 0)
-	            {
-	                // 2. LED 시퀀스 시작! (예: 5Hz로 10초간)
-	                // (나중에는 "LED_ON:5" 처럼 뒤에 숫자를 파싱해서 넣을 수도 있음)
-	                Start_Photic_Sequence(5, 10);
-
-	                // 3. "알겠다"고 응답 보냄
-	                char ack[] = "CMD_OK: Started 5Hz\r\n";
-	                CDC_Transmit_FS((uint8_t*)ack, strlen(ack));
-	            }
-	            else if (strncmp(rx_cmd_buffer, "LED_OFF", 7) == 0)
-	            {
-	                // 강제 종료 기능
-	                photic.is_running = 0;
-	                HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);
-	            }
-
-	            // 4. 처리 끝났으니 깃발 내림
-	            usb_data_received = 0;
+	        // [Task 1] USB 패킷 처리
+	        if (usb_data_received == 1) {
+	            Parse_Heartbeat_Packet(rx_buffer); // 해석하고 -> 세팅하고 -> 응답 보냄
+	            usb_data_received = 0; // 깃발 내리기
 	        }
 
-	        // ==========================================
-	        // [Task 2] Heartbeat 전송 (250ms 주기)
-	        // ==========================================
-	        if (current_time - last_heartbeat_tick >= 250)
-	        {
-	            Send_Heartbeat_Packet();      // 상태 보고
-	            last_heartbeat_tick = current_time; // 시간 갱신
+	        // [Task 2] Fail-safe (Heartbeat Timeout 감시)
+	        // 규격: 2초 이상 수신 없으면 정지
+	        if (current_time - last_hb_received_tick > 2000) {
+	            if (photic.error_code != 1) { // 에러가 아닐 때만 진입 (반복 실행 방지)
+	                photic.is_running = 0;       // 동작 정지
+	                HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4); // PWM 끄기
+	                photic.error_code = 1;       // 에러 1: Timeout 설정
+	            }
 	        }
 
-	        // ==========================================
-	        // [Task 3] LED 제어 (논블로킹)
-	        // ==========================================
-	        // 얘는 멈추지 않고 계속 불러줘야 시간이 되면 알아서 켜고 끕니다.
+	        // [Task 3] LED 깜빡임 제어
 	        Update_Photic_Sequence();
-
 
   }
     /* USER CODE END WHILE */
@@ -435,150 +389,149 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-// [TIM7 기반 정밀 딜레이] 절대 안 멈춤
-void Delay_us(uint16_t us)
-{
-    // 1. 카운터를 0으로 리셋
-    __HAL_TIM_SET_COUNTER(&htim7, 0);
 
-    // 2. 시간이 될 때까지 기다림 (TIM7은 1us마다 1씩 증가함)
-    while (__HAL_TIM_GET_COUNTER(&htim7) < us);
+
+// [기능 1] Device -> Host 상태 응답 전송 (14 Bytes)
+void Send_Status_Response() {
+    uint8_t packet[14];
+
+    // [0] SOP
+    packet[0] = SOP;
+    // [1] ID ('h')
+    packet[1] = CMD_HEARTBEAT;
+    // [2] Freq (+0x20 인코딩)
+    packet[2] = photic.freq_hz + 0x20;
+    // [3] Duration (고정 0x20)
+    packet[3] = 0x20;
+    // [4] Intensity (+0x20)
+    packet[4] = photic.intensity + 0x20;
+    // [5] Flash Duration (+0x20)
+    packet[5] = photic.flash_duration + 0x20;
+
+    // [6] Status Flags
+    // Bit 0: Active, Bit 1: Standby, Bit 2: Force Stop, Bit 3: Error
+    uint8_t status = 0;
+    if (photic.is_running) status |= (1 << 0); // Active
+    else status |= (1 << 1);                   // Standby
+
+    if (photic.error_code != 0) status |= (1 << 3); // Error Present
+    packet[6] = status;
+
+    // [7] External Trigger (PA8 상태 읽기)
+    // PA8이 High면 1, Low면 0
+    photic.ext_trig_state = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8);
+    packet[7] = photic.ext_trig_state;
+
+    // [8] Error Code
+    packet[8] = photic.error_code;
+
+    // [9] SW Version (예: 1.0 -> 0x10)
+    packet[9] = 0x10;
+
+    // [10~12] Spare
+    packet[10] = 0; packet[11] = 0; packet[12] = 0;
+
+    // [13] EOP
+    packet[13] = EOP;
+
+    // 전송!
+    CDC_Transmit_FS(packet, 14);
 }
 
-//void Run_Photic_Sequence(uint32_t freq_hz, uint32_t duration_sec)
-//{
-//    // 1. 0으로 나누기 방지 (Safety)
-//    if (freq_hz == 0) return;
-//
-//    // 2. 주기 및 꺼짐 시간 계산 (단위: ms)
-//    // 예: 5Hz -> period = 200ms, off_time = 190ms
-//    uint32_t period_ms = 1000 / freq_hz;
-//    uint32_t on_time_ms = 10; // 광자극 표준 (Flash Duration)
-//
-//    // 방어 코드: 주기가 10ms보다 짧으면 켜져만 있게 됨
-//    if (period_ms <= on_time_ms) period_ms = on_time_ms + 1;
-//
-//    uint32_t off_time_ms = period_ms - on_time_ms;
-//
-//    // 3. 반복 횟수 계산
-//    // 예: 5Hz로 10초 동안 하려면? -> 5 * 10 = 50번 깜빡여야 함
-//    uint32_t total_counts = freq_hz * duration_sec;
-//
-//    // 4. 실행 루프
-//    for (uint32_t i = 0; i < total_counts; i++)
-//    {
-//        // [ON] 10ms
-//        HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
-//        Delay_us(on_time_ms * 1000); // us 단위 함수 사용 시 *1000
-//
-//        // [OFF] 계산된 시간만큼
-//        HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);
-//        HAL_Delay(off_time_ms);
-//    }
-//}
-// [기능 1] LED 시퀀스 시작 설정 (설정만 하고 바로 끝남)
-void Start_Photic_Sequence(uint32_t freq_hz, uint32_t duration_sec) {
+// [기능 2] Host 패킷 해석 (Parsing) 및 제어
+void Parse_Heartbeat_Packet(uint8_t* data) {
+    // 1. 유효성 검사 (SOP, EOP 확인)
+    if (data[0] != SOP || data[1] != CMD_HEARTBEAT || data[11] != EOP) return;
 
-    // [수정됨] 1. 주파수 유효성 검사 (Safety Filter)
-    // 허용된 주파수가 아니면 무조건 1Hz로 고정합니다.
-    switch (freq_hz) {
-        case 1: case 3: case 5: case 10:
-        case 13: case 15: case 20: case 25: case 30:
-            // 유효한 주파수임. 통과!
-            break;
-        default:
-            // 목록에 없는 값이거나 0이 들어오면 기본값 1Hz로 변경
-            freq_hz = 1;
-            break;
-    }
+    // 2. Heartbeat 수신 인정 (타임아웃 리셋)
+    last_hb_received_tick = HAL_GetTick();
+    if (photic.error_code == 1) photic.error_code = 0; // 타임아웃 에러 해제
+    // 3. 제어 플래그 확인
+        uint8_t ctrl_flag = data[6];
+        uint8_t force_stop = (ctrl_flag >> 1) & 0x01;
+        uint8_t enable = (ctrl_flag >> 0) & 0x01;
 
-    // 2. 설정값 저장
-    photic.freq_hz = freq_hz;
-    photic.duration_ms = duration_sec * 1000;
+        if (force_stop) {
+            photic.is_running = 0;
+            HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);
+        }
+        else if (enable) {
+            // [수정된 부분] 동작 설정 업데이트
+            uint32_t new_freq = data[2] - 0x20;
+            uint32_t new_intensity = data[4] - 0x20; // 1 ~ 10 값
+            uint32_t new_flash = data[5] - 0x20;
 
-    // 3. 주기 계산 (정수 나눗셈)
-    // 예: 13Hz -> 1000 / 13 = 76ms (약간의 오차는 있지만 허용 범위)
-    photic.period_ms = 1000 / freq_hz;
-    photic.on_time_ms = 10; // 광자극 표준 10ms
+            // 값 업데이트
+            photic.freq_hz = new_freq;
+            photic.flash_duration = new_flash;
 
-    // 방어 코드: 주기가 너무 짧아서 꺼질 틈이 없는 경우 보정
-    if (photic.period_ms <= photic.on_time_ms) {
-        photic.period_ms = photic.on_time_ms + 1;
-    }
+            // ★★★ 여기서 실제 밝기 적용! ★★★
+            // 값이 바뀌었을 때만 함수를 호출해서 CPU 낭비를 줄입니다.
+            if (photic.intensity != new_intensity) {
+                photic.intensity = new_intensity;
 
-    // 4. 타이밍 초기화 및 시작
-    photic.start_tick = HAL_GetTick();       // 전체 동작 시작 시간
-    photic.last_toggle_tick = HAL_GetTick(); // 깜빡임 기준 시간
-    photic.is_running = 1;                   // 작동 플래그 ON
+                // Protocol(1~10) -> PWM(10~100%) 변환
+                // 예: 5 -> 50%
+                LED_Set_Brightness_10kHz(photic.intensity * 10);
+            }
 
-    // 5. 즉시 시작 (첫 번째 펄스)
-    HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
-    photic.led_state = 1; // 켜짐 상태로 시작
+            // 주기 재계산
+            if (photic.freq_hz > 0) photic.period_ms = 1000 / photic.freq_hz;
+            else photic.period_ms = 1000;
+
+            // 시작 플래그가 꺼져 있었다면 시작
+            if (photic.is_running == 0) {
+                 photic.is_running = 1;
+                 photic.start_tick = HAL_GetTick();
+                 photic.last_toggle_tick = HAL_GetTick();
+
+                 // 시작할 때도 현재 밝기로 확실하게 세팅하고 켬
+                 LED_Set_Brightness_10kHz(photic.intensity * 10);
+                 HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
+                 photic.led_state = 1;
+            }
+        }
+        else {
+            // 일반 정지
+            photic.is_running = 0;
+            HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);
+        }
+
+        // 4. 응답 전송 (그대로)
+        Send_Status_Response();
+
 }
 
-// [기능 2] LED 상태 업데이트 (while문에서 계속 호출됨)
+// [기능 3] LED 제어 (Non-blocking)
 void Update_Photic_Sequence() {
-    // 1. 작동 중이 아니면 바로 리턴 (CPU 낭비 없음)
     if (photic.is_running == 0) return;
 
     uint32_t current_tick = HAL_GetTick();
 
-    // 2. 전체 시간(10초) 종료 확인
-    if (current_tick - photic.start_tick >= photic.duration_ms) {
-        HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4); // 끄기
-        photic.is_running = 0; // 종료
-        photic.led_state = 0;
-        return;
-    }
-
-    // 3. LED 켜고 끄기 타이밍 계산 (비동기 처리)
-    if (photic.led_state == 1) {
-        // [켜진 상태] -> 10ms 지났는지 확인
-        if (current_tick - photic.last_toggle_tick >= photic.on_time_ms) {
-            HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4); // 끄기
+    // 깜빡임 로직
+    if (photic.led_state == 1) { // 켜짐 상태
+        // 설정된 Flash Duration 만큼 켜짐
+        if (current_tick - photic.last_toggle_tick >= photic.flash_duration) {
+            HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);
             photic.led_state = 0;
-            // 주의: last_toggle_tick을 여기서 갱신하지 않음 (주기 유지를 위해)
+            // last_toggle_tick은 갱신하지 않음 (주기 유지를 위해)
         }
-    }
-    else {
-        // [꺼진 상태] -> (주기 - 10ms) 지났는지 확인 (즉, 다음 주기가 되었는지)
+    } else { // 꺼짐 상태
         if (current_tick - photic.last_toggle_tick >= photic.period_ms) {
-            HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4); // 켜기
+            HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
             photic.led_state = 1;
-            photic.last_toggle_tick = current_tick; // 주기 리셋
+            photic.last_toggle_tick = current_tick;
         }
     }
 }
 
-// [기능 3] Heartbeat 전송 (250ms마다 호출됨)
-void Send_Heartbeat_Packet() {
-    char msg[64];
-    // 현재 상태(동작 중인지, 주파수는 몇인지)를 담아서 보냄
-    sprintf(msg, "HB: Status=%s, Freq=%luHz\r\n",
-            photic.is_running ? "RUN" : "IDLE",
-            photic.freq_hz);
-
-    // 전송 (바쁘면 무시하거나 재시도 로직 추가 가능)
-    CDC_Transmit_FS((uint8_t*)msg, strlen(msg));
-}
-
-
-// [기능 4] USB 수신 핸들러 (인터럽트에서 호출)
-void USB_CDC_RxHandler(uint8_t* Buf, uint32_t Len)
-{
-//    // 1. "LED_ON" 6글자가 맞는지 확인
-//    if (Len >= 6 && strncmp((char*)Buf, "LED_ON", 6) == 0)
-//    {
-//        // 2. 맞으면 깃발을 1로 세팅하고 끝!
-//    	usb_data_received = 1;
-//    }
-	// 데이터를 안전한 곳(rx_cmd_buffer)에 복사
-	    memset(rx_cmd_buffer, 0, sizeof(rx_cmd_buffer));
-	    if (Len < 64) memcpy(rx_cmd_buffer, Buf, Len);
-	    else memcpy(rx_cmd_buffer, Buf, 63); // 버퍼 오버플로우 방지
-
-	    usb_data_received = 1; // "메인아, 편지 왔다!" 깃발 들기
-
+// [기능 4] USB 수신 핸들러
+void USB_CDC_RxHandler(uint8_t* Buf, uint32_t Len) {
+    // 12바이트 패킷 복사
+    if (Len >= 12) {
+        memcpy(rx_buffer, Buf, 12);
+        usb_data_received = 1; // 깃발 들기
+    }
 }
 
 int _write(int file, char *ptr, int len) // printf 함수가 호출되면 _write 함수가 호출되고 _write 함수가 다시 __io_putchar 함수를 호출하는 구조
@@ -591,6 +544,56 @@ int _write(int file, char *ptr, int len) // printf 함수가 호출되면 _write
 //	USB CDC 로 송신하는 코드
 	CDC_Transmit_FS((uint8_t*) ptr, len); return len;
 }
+
+// [TIM7 기반 정밀 딜레이] 절대 안 멈춤
+void Delay_us(uint16_t us)
+{
+    // 1. 카운터를 0으로 리셋
+    __HAL_TIM_SET_COUNTER(&htim7, 0);
+
+    // 2. 시간이 될 때까지 기다림 (TIM7은 1us마다 1씩 증가함)
+    while (__HAL_TIM_GET_COUNTER(&htim7) < us);
+}
+
+//
+//void Start_Photic_Sequence(uint32_t freq_hz, uint32_t duration_sec) {
+//
+//    // [수정됨] 1. 주파수 유효성 검사 (Safety Filter)
+//    // 허용된 주파수가 아니면 무조건 1Hz로 고정합니다.
+//    switch (freq_hz) {
+//        case 1: case 3: case 5: case 10:
+//        case 13: case 15: case 20: case 25: case 30:
+//            // 유효한 주파수임. 통과!
+//            break;
+//        default:
+//            // 목록에 없는 값이거나 0이 들어오면 기본값 1Hz로 변경
+//            freq_hz = 1;
+//            break;
+//    }
+//
+//    // 2. 설정값 저장
+//    photic.freq_hz = freq_hz;
+//    photic.duration_ms = duration_sec * 1000;
+//
+//    // 3. 주기 계산 (정수 나눗셈)
+//    // 예: 13Hz -> 1000 / 13 = 76ms (약간의 오차는 있지만 허용 범위)
+//    photic.period_ms = 1000 / freq_hz;
+//    photic.on_time_ms = 10; // 광자극 표준 10ms
+//
+//    // 방어 코드: 주기가 너무 짧아서 꺼질 틈이 없는 경우 보정
+//    if (photic.period_ms <= photic.on_time_ms) {
+//        photic.period_ms = photic.on_time_ms + 1;
+//    }
+//
+//    // 4. 타이밍 초기화 및 시작
+//    photic.start_tick = HAL_GetTick();       // 전체 동작 시작 시간
+//    photic.last_toggle_tick = HAL_GetTick(); // 깜빡임 기준 시간
+//    photic.is_running = 1;                   // 작동 플래그 ON
+//
+//    // 5. 즉시 시작 (첫 번째 펄스)
+//    HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
+//    photic.led_state = 1; // 켜짐 상태로 시작
+//}
 
 /* USER CODE END 4 */
 
