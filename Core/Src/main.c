@@ -141,8 +141,8 @@ int main(void)
 //          HAL_Delay(2000);
 
     // 모든 코스가 끝나면 안전하게 끄기
-      HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+//      HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);
+//      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
   /* USER CODE END 2 */
 
   /* Infinite loop */
