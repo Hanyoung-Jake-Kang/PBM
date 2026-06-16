@@ -108,6 +108,9 @@ int main(void)
   MX_TIM7_Init();
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
+
+  HAL_Delay(10000); // 커패시터 충전 할 시간 1 0초 확보
+
   // 1. 스톱워치용 타이머(TIM7) 켜기
   HAL_TIM_Base_Start(&htim7);
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET); // LED 5V ON
