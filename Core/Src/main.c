@@ -109,7 +109,7 @@ int main(void)
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
 
-  HAL_Delay(10000); // 커패시터 충전 할 시간 1 0초 확보
+  HAL_Delay(500); // 커패시터 충전 할 시간 1 0초 확보
 
   // 1. 스톱워치용 타이머(TIM7) 켜기
   HAL_TIM_Base_Start(&htim7);
@@ -117,7 +117,7 @@ int main(void)
 //  LED_Set_Brightness_10kHz(BRIGHTNESS_30); // 밝기 설정
     LED_Set_Brightness_10kHz(BRIGHTNESS_DC_MAX); // 최대 밝기 설정 -->LED 최대밝기테스트
  	HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
- 	HAL_Delay(3000);
+ 	HAL_Delay(500);
   uint32_t target_freqs[] = {1, 3, 5, 10, 13, 15, 20, 25, 30};
 //  int num_steps = sizeof(target_freqs) / sizeof(target_freqs[0]);
     int num_steps = 1; // 한개의 주파수만 테스트 코드 1번 , 원래는 ↑ 살릴 것
