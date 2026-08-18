@@ -1,0 +1,10 @@
+10:14:57 **** Incremental Build of configuration Debug for project heden ****
+make -j12 all 
+arm-none-eabi-size  heden.elf 
+   text	   data	    bss	    dec	    hex	filename
+ 516232	   7988	  67096	 591316	  905d4	heden.elf
+Finished building: default.size.stdout
+ 
+
+10:14:59 Build Finished. 0 errors, 0 warnings. (took 1s.512ms)
+

@@ -39,15 +39,15 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  17 .debug_macro  000220a8  00000000  00000000  00025a4c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line   00017d9a  00000000  00000000  00047af4  2**0
+ 18 .debug_line   00017d72  00000000  00000000  00047af4  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    000c465e  00000000  00000000  0005f88e  2**0
+ 19 .debug_str    000c466b  00000000  00000000  0005f866  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .comment      00000043  00000000  00000000  00123eec  2**0
+ 20 .comment      00000043  00000000  00000000  00123ed1  2**0
                   CONTENTS, READONLY
- 21 .debug_frame  00005078  00000000  00000000  00123f30  2**2
+ 21 .debug_frame  00005078  00000000  00000000  00123f14  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 22 .debug_line_str 0000006c  00000000  00000000  00128fa8  2**0
+ 22 .debug_line_str 00000079  00000000  00000000  00128f8c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -483,122 +483,121 @@ CNT (현재 카운트) >= CCR (설정값) 이면: Low
  800057c:	51eb851f 	.word	0x51eb851f
 
 08000580 <main>:
+
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
-int main(void)
-{
+ * @brief  The application entry point.
+ * @retval int
+ */
+int main(void) {
  8000580:	b580      	push	{r7, lr}
  8000582:	b082      	sub	sp, #8
  8000584:	af00      	add	r7, sp, #0
-  /* USER CODE END 1 */
+	/* USER CODE END 1 */
 
-  /* MCU Configuration--------------------------------------------------------*/
+	/* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+	HAL_Init();
  8000586:	f000 fccf 	bl	8000f28 <HAL_Init>
 
-  /* USER CODE BEGIN Init */
-  /* USER CODE END Init */
+	/* USER CODE BEGIN Init */
+	/* USER CODE END Init */
 
-  /* Configure the system clock */
-  SystemClock_Config();
+	/* Configure the system clock */
+	SystemClock_Config();
  800058a:	f000 f851 	bl	8000630 <SystemClock_Config>
-  /* USER CODE BEGIN SysInit */
+	/* USER CODE BEGIN SysInit */
 
-  /* USER CODE END SysInit */
+	/* USER CODE END SysInit */
 
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
+	/* Initialize all configured peripherals */
+	MX_GPIO_Init();
  800058e:	f000 f98f 	bl	80008b0 <MX_GPIO_Init>
-  MX_USART1_UART_Init();
+	MX_USART1_UART_Init();
  8000592:	f000 f963 	bl	800085c <MX_USART1_UART_Init>
-  MX_TIM4_Init();
+	MX_TIM4_Init();
  8000596:	f000 f8b5 	bl	8000704 <MX_TIM4_Init>
-  MX_TIM7_Init();
+	MX_TIM7_Init();
  800059a:	f000 f929 	bl	80007f0 <MX_TIM7_Init>
-  MX_USB_DEVICE_Init();
+	MX_USB_DEVICE_Init();
  800059e:	f007 fc4b 	bl	8007e38 <MX_USB_DEVICE_Init>
-  /* USER CODE BEGIN 2 */
-  // 1. 스톱워치용 타이머(TIM7) 켜기
-  HAL_TIM_Base_Start(&htim7);
+	/* USER CODE BEGIN 2 */
+	// 1. 스톱워치용 타이머(TIM7) 켜기
+	HAL_TIM_Base_Start(&htim7);
  80005a2:	481c      	ldr	r0, [pc, #112]	@ (8000614 <main+0x94>)
  80005a4:	f002 ff30 	bl	8003408 <HAL_TIM_Base_Start>
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET); // LED 5V ON
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET); // LED 5V ON
  80005a8:	2201      	movs	r2, #1
  80005aa:	2101      	movs	r1, #1
  80005ac:	481a      	ldr	r0, [pc, #104]	@ (8000618 <main+0x98>)
  80005ae:	f001 f817 	bl	80015e0 <HAL_GPIO_WritePin>
-  LED_Set_Brightness_10kHz(BRIGHTNESS_30); // 밝기 설정
+	LED_Set_Brightness_10kHz(BRIGHTNESS_30); // 밝기 설정
  80005b2:	201e      	movs	r0, #30
  80005b4:	f7ff ff9e 	bl	80004f4 <LED_Set_Brightness_10kHz>
 
-  /* USER CODE END 2 */
+	/* USER CODE END 2 */
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  last_hb_received_tick = HAL_GetTick();
+	/* Infinite loop */
+	/* USER CODE BEGIN WHILE */
+	last_hb_received_tick = HAL_GetTick();
  80005b8:	f000 fd1c 	bl	8000ff4 <HAL_GetTick>
  80005bc:	4603      	mov	r3, r0
  80005be:	4a17      	ldr	r2, [pc, #92]	@ (800061c <main+0x9c>)
  80005c0:	6013      	str	r3, [r2, #0]
-  while (1)
-  {
-	  uint32_t current_time = HAL_GetTick();
+	while (1) {
+		uint32_t current_time = HAL_GetTick();
  80005c2:	f000 fd17 	bl	8000ff4 <HAL_GetTick>
  80005c6:	6078      	str	r0, [r7, #4]
 
-	        // [Task 1] USB 패킷 처리
-	        if (usb_data_received == 1) {
+		// [Task 1] USB 패킷 처리
+		if (usb_data_received == 1) {
  80005c8:	4b15      	ldr	r3, [pc, #84]	@ (8000620 <main+0xa0>)
  80005ca:	781b      	ldrb	r3, [r3, #0]
  80005cc:	b2db      	uxtb	r3, r3
  80005ce:	2b01      	cmp	r3, #1
  80005d0:	d105      	bne.n	80005de <main+0x5e>
-	            Parse_Heartbeat_Packet(rx_buffer); // 해석하고 -> 세팅하고 -> 응답 보냄
+			Parse_Heartbeat_Packet(rx_buffer); // 해석하고 -> 세팅하고 -> 응답 보냄
  80005d2:	4814      	ldr	r0, [pc, #80]	@ (8000624 <main+0xa4>)
  80005d4:	f000 fa2a 	bl	8000a2c <Parse_Heartbeat_Packet>
-	            usb_data_received = 0; // 깃발 내리기
+			usb_data_received = 0; // 깃발 내리기
  80005d8:	4b11      	ldr	r3, [pc, #68]	@ (8000620 <main+0xa0>)
  80005da:	2200      	movs	r2, #0
  80005dc:	701a      	strb	r2, [r3, #0]
-	        }
+		}
 
-	        // [Task 2] Fail-safe (Heartbeat Timeout 감시)
-	        // 규격: 2초 이상 수신 없으면 정지
-	        if (current_time - last_hb_received_tick > 2000) {
+		// [Task 2] Fail-safe (Heartbeat Timeout 감시)
+		// 규격: 2초 이상 수신 없으면 정지
+		if (current_time - last_hb_received_tick > 2000) {
  80005de:	4b0f      	ldr	r3, [pc, #60]	@ (800061c <main+0x9c>)
  80005e0:	681b      	ldr	r3, [r3, #0]
  80005e2:	687a      	ldr	r2, [r7, #4]
  80005e4:	1ad3      	subs	r3, r2, r3
  80005e6:	f5b3 6ffa 	cmp.w	r3, #2000	@ 0x7d0
  80005ea:	d90f      	bls.n	800060c <main+0x8c>
-	            if (photic.error_code != 1) { // 에러가 아닐 때만 진입 (반복 실행 방지)
+			if (photic.error_code != 1) { // 에러가 아닐 때만 진입 (반복 실행 방지)
  80005ec:	4b0e      	ldr	r3, [pc, #56]	@ (8000628 <main+0xa8>)
  80005ee:	f893 3021 	ldrb.w	r3, [r3, #33]	@ 0x21
  80005f2:	2b01      	cmp	r3, #1
  80005f4:	d00a      	beq.n	800060c <main+0x8c>
-	                photic.is_running = 0;       // 동작 정지
+				photic.is_running = 0;       // 동작 정지
  80005f6:	4b0c      	ldr	r3, [pc, #48]	@ (8000628 <main+0xa8>)
  80005f8:	2200      	movs	r2, #0
  80005fa:	701a      	strb	r2, [r3, #0]
-	                HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4); // PWM 끄기
+				HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4); // PWM 끄기
  80005fc:	210c      	movs	r1, #12
  80005fe:	480b      	ldr	r0, [pc, #44]	@ (800062c <main+0xac>)
  8000600:	f003 f88c 	bl	800371c <HAL_TIM_PWM_Stop>
-	                photic.error_code = 1;       // 에러 1: Timeout 설정
+				photic.error_code = 1;       // 에러 1: Timeout 설정
  8000604:	4b08      	ldr	r3, [pc, #32]	@ (8000628 <main+0xa8>)
  8000606:	2201      	movs	r2, #1
  8000608:	f883 2021 	strb.w	r2, [r3, #33]	@ 0x21
-	            }
-	        }
+			}
+		}
 
-	        // [Task 3] LED 깜빡임 제어
-	        Update_Photic_Sequence();
+		// [Task 3] LED 깜빡임 제어
+		Update_Photic_Sequence();
  800060c:	f000 faba 	bl	8000b84 <Update_Photic_Sequence>
-  {
+	while (1) {
  8000610:	e7d7      	b.n	80005c2 <main+0x42>
  8000612:	bf00      	nop
  8000614:	20000160 	.word	0x20000160
@@ -610,22 +609,22 @@ int main(void)
  800062c:	20000118 	.word	0x20000118
 
 08000630 <SystemClock_Config>:
+
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
-void SystemClock_Config(void)
-{
+ * @brief System Clock Configuration
+ * @retval None
+ */
+void SystemClock_Config(void) {
  8000630:	b580      	push	{r7, lr}
  8000632:	b094      	sub	sp, #80	@ 0x50
  8000634:	af00      	add	r7, sp, #0
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+	RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
  8000636:	f107 0320 	add.w	r3, r7, #32
  800063a:	2230      	movs	r2, #48	@ 0x30
  800063c:	2100      	movs	r1, #0
  800063e:	4618      	mov	r0, r3
  8000640:	f008 f922 	bl	8008888 <memset>
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+	RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
  8000644:	f107 030c 	add.w	r3, r7, #12
  8000648:	2200      	movs	r2, #0
  800064a:	601a      	str	r2, [r3, #0]
@@ -634,9 +633,9 @@ void SystemClock_Config(void)
  8000650:	60da      	str	r2, [r3, #12]
  8000652:	611a      	str	r2, [r3, #16]
 
-  /** Configure the main internal regulator output voltage
-  */
-  __HAL_RCC_PWR_CLK_ENABLE();
+	/** Configure the main internal regulator output voltage
+	 */
+	__HAL_RCC_PWR_CLK_ENABLE();
  8000654:	2300      	movs	r3, #0
  8000656:	60bb      	str	r3, [r7, #8]
  8000658:	4b28      	ldr	r3, [pc, #160]	@ (80006fc <SystemClock_Config+0xcc>)
@@ -649,7 +648,7 @@ void SystemClock_Config(void)
  8000668:	f003 5380 	and.w	r3, r3, #268435456	@ 0x10000000
  800066c:	60bb      	str	r3, [r7, #8]
  800066e:	68bb      	ldr	r3, [r7, #8]
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+	__HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
  8000670:	2300      	movs	r3, #0
  8000672:	607b      	str	r3, [r7, #4]
  8000674:	4b22      	ldr	r3, [pc, #136]	@ (8000700 <SystemClock_Config+0xd0>)
@@ -663,65 +662,64 @@ void SystemClock_Config(void)
  8000688:	607b      	str	r3, [r7, #4]
  800068a:	687b      	ldr	r3, [r7, #4]
 
-  /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+	/** Initializes the RCC Oscillators according to the specified parameters
+	 * in the RCC_OscInitTypeDef structure.
+	 */
+	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
  800068c:	2301      	movs	r3, #1
  800068e:	623b      	str	r3, [r7, #32]
-  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+	RCC_OscInitStruct.HSEState = RCC_HSE_ON;
  8000690:	f44f 3380 	mov.w	r3, #65536	@ 0x10000
  8000694:	627b      	str	r3, [r7, #36]	@ 0x24
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
  8000696:	2302      	movs	r3, #2
  8000698:	63bb      	str	r3, [r7, #56]	@ 0x38
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
  800069a:	f44f 0380 	mov.w	r3, #4194304	@ 0x400000
  800069e:	63fb      	str	r3, [r7, #60]	@ 0x3c
-  RCC_OscInitStruct.PLL.PLLM = 15;
+	RCC_OscInitStruct.PLL.PLLM = 15;
  80006a0:	230f      	movs	r3, #15
  80006a2:	643b      	str	r3, [r7, #64]	@ 0x40
-  RCC_OscInitStruct.PLL.PLLN = 144;
+	RCC_OscInitStruct.PLL.PLLN = 144;
  80006a4:	2390      	movs	r3, #144	@ 0x90
  80006a6:	647b      	str	r3, [r7, #68]	@ 0x44
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+	RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
  80006a8:	2302      	movs	r3, #2
  80006aa:	64bb      	str	r3, [r7, #72]	@ 0x48
-  RCC_OscInitStruct.PLL.PLLQ = 5;
+	RCC_OscInitStruct.PLL.PLLQ = 5;
  80006ac:	2305      	movs	r3, #5
  80006ae:	64fb      	str	r3, [r7, #76]	@ 0x4c
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
  80006b0:	f107 0320 	add.w	r3, r7, #32
  80006b4:	4618      	mov	r0, r3
  80006b6:	f002 f9ff 	bl	8002ab8 <HAL_RCC_OscConfig>
  80006ba:	4603      	mov	r3, r0
  80006bc:	2b00      	cmp	r3, #0
  80006be:	d001      	beq.n	80006c4 <SystemClock_Config+0x94>
-  {
-    Error_Handler();
+		Error_Handler();
  80006c0:	f000 fab4 	bl	8000c2c <Error_Handler>
-  }
+	}
 
-  /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+	/** Initializes the CPU, AHB and APB buses clocks
+	 */
+	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
  80006c4:	230f      	movs	r3, #15
  80006c6:	60fb      	str	r3, [r7, #12]
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+			| RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
  80006c8:	2302      	movs	r3, #2
  80006ca:	613b      	str	r3, [r7, #16]
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
  80006cc:	2300      	movs	r3, #0
  80006ce:	617b      	str	r3, [r7, #20]
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
  80006d0:	f44f 53a0 	mov.w	r3, #5120	@ 0x1400
  80006d4:	61bb      	str	r3, [r7, #24]
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
+	RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
  80006d6:	f44f 5380 	mov.w	r3, #4096	@ 0x1000
  80006da:	61fb      	str	r3, [r7, #28]
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
+	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK) {
  80006dc:	f107 030c 	add.w	r3, r7, #12
  80006e0:	2103      	movs	r1, #3
  80006e2:	4618      	mov	r0, r3
@@ -729,10 +727,9 @@ void SystemClock_Config(void)
  80006e8:	4603      	mov	r3, r0
  80006ea:	2b00      	cmp	r3, #0
  80006ec:	d001      	beq.n	80006f2 <SystemClock_Config+0xc2>
-  {
-    Error_Handler();
+		Error_Handler();
  80006ee:	f000 fa9d 	bl	8000c2c <Error_Handler>
-  }
+	}
 }
  80006f2:	bf00      	nop
  80006f4:	3750      	adds	r7, #80	@ 0x50
@@ -743,33 +740,33 @@ void SystemClock_Config(void)
  8000700:	40007000 	.word	0x40007000
 
 08000704 <MX_TIM4_Init>:
-  * @brief TIM4 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_TIM4_Init(void)
-{
+/**
+ * @brief TIM4 Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_TIM4_Init(void) {
  8000704:	b580      	push	{r7, lr}
  8000706:	b08e      	sub	sp, #56	@ 0x38
  8000708:	af00      	add	r7, sp, #0
 
-  /* USER CODE BEGIN TIM4_Init 0 */
+	/* USER CODE BEGIN TIM4_Init 0 */
 
-  /* USER CODE END TIM4_Init 0 */
+	/* USER CODE END TIM4_Init 0 */
 
-  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+	TIM_ClockConfigTypeDef sClockSourceConfig = { 0 };
  800070a:	f107 0328 	add.w	r3, r7, #40	@ 0x28
  800070e:	2200      	movs	r2, #0
  8000710:	601a      	str	r2, [r3, #0]
  8000712:	605a      	str	r2, [r3, #4]
  8000714:	609a      	str	r2, [r3, #8]
  8000716:	60da      	str	r2, [r3, #12]
-  TIM_MasterConfigTypeDef sMasterConfig = {0};
+	TIM_MasterConfigTypeDef sMasterConfig = { 0 };
  8000718:	f107 0320 	add.w	r3, r7, #32
  800071c:	2200      	movs	r2, #0
  800071e:	601a      	str	r2, [r3, #0]
  8000720:	605a      	str	r2, [r3, #4]
-  TIM_OC_InitTypeDef sConfigOC = {0};
+	TIM_OC_InitTypeDef sConfigOC = { 0 };
  8000722:	1d3b      	adds	r3, r7, #4
  8000724:	2200      	movs	r2, #0
  8000726:	601a      	str	r2, [r3, #0]
@@ -780,47 +777,46 @@ static void MX_TIM4_Init(void)
  8000730:	615a      	str	r2, [r3, #20]
  8000732:	619a      	str	r2, [r3, #24]
 
-  /* USER CODE BEGIN TIM4_Init 1 */
+	/* USER CODE BEGIN TIM4_Init 1 */
 
-  /* USER CODE END TIM4_Init 1 */
-  htim4.Instance = TIM4;
+	/* USER CODE END TIM4_Init 1 */
+	htim4.Instance = TIM4;
  8000734:	4b2c      	ldr	r3, [pc, #176]	@ (80007e8 <MX_TIM4_Init+0xe4>)
  8000736:	4a2d      	ldr	r2, [pc, #180]	@ (80007ec <MX_TIM4_Init+0xe8>)
  8000738:	601a      	str	r2, [r3, #0]
-  htim4.Init.Prescaler = 0;
+	htim4.Init.Prescaler = 0;
  800073a:	4b2b      	ldr	r3, [pc, #172]	@ (80007e8 <MX_TIM4_Init+0xe4>)
  800073c:	2200      	movs	r2, #0
  800073e:	605a      	str	r2, [r3, #4]
-  htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
+	htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
  8000740:	4b29      	ldr	r3, [pc, #164]	@ (80007e8 <MX_TIM4_Init+0xe4>)
  8000742:	2200      	movs	r2, #0
  8000744:	609a      	str	r2, [r3, #8]
-  htim4.Init.Period = 749;
+	htim4.Init.Period = 749;
  8000746:	4b28      	ldr	r3, [pc, #160]	@ (80007e8 <MX_TIM4_Init+0xe4>)
  8000748:	f240 22ed 	movw	r2, #749	@ 0x2ed
  800074c:	60da      	str	r2, [r3, #12]
-  htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+	htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
  800074e:	4b26      	ldr	r3, [pc, #152]	@ (80007e8 <MX_TIM4_Init+0xe4>)
  8000750:	2200      	movs	r2, #0
  8000752:	611a      	str	r2, [r3, #16]
-  htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+	htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
  8000754:	4b24      	ldr	r3, [pc, #144]	@ (80007e8 <MX_TIM4_Init+0xe4>)
  8000756:	2280      	movs	r2, #128	@ 0x80
  8000758:	619a      	str	r2, [r3, #24]
-  if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
+	if (HAL_TIM_Base_Init(&htim4) != HAL_OK) {
  800075a:	4823      	ldr	r0, [pc, #140]	@ (80007e8 <MX_TIM4_Init+0xe4>)
  800075c:	f002 fe04 	bl	8003368 <HAL_TIM_Base_Init>
  8000760:	4603      	mov	r3, r0
  8000762:	2b00      	cmp	r3, #0
  8000764:	d001      	beq.n	800076a <MX_TIM4_Init+0x66>
-  {
-    Error_Handler();
+		Error_Handler();
  8000766:	f000 fa61 	bl	8000c2c <Error_Handler>
-  }
-  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+	}
+	sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
  800076a:	f44f 5380 	mov.w	r3, #4096	@ 0x1000
  800076e:	62bb      	str	r3, [r7, #40]	@ 0x28
-  if (HAL_TIM_ConfigClockSource(&htim4, &sClockSourceConfig) != HAL_OK)
+	if (HAL_TIM_ConfigClockSource(&htim4, &sClockSourceConfig) != HAL_OK) {
  8000770:	f107 0328 	add.w	r3, r7, #40	@ 0x28
  8000774:	4619      	mov	r1, r3
  8000776:	481c      	ldr	r0, [pc, #112]	@ (80007e8 <MX_TIM4_Init+0xe4>)
@@ -828,27 +824,25 @@ static void MX_TIM4_Init(void)
  800077c:	4603      	mov	r3, r0
  800077e:	2b00      	cmp	r3, #0
  8000780:	d001      	beq.n	8000786 <MX_TIM4_Init+0x82>
-  {
-    Error_Handler();
+		Error_Handler();
  8000782:	f000 fa53 	bl	8000c2c <Error_Handler>
-  }
-  if (HAL_TIM_PWM_Init(&htim4) != HAL_OK)
+	}
+	if (HAL_TIM_PWM_Init(&htim4) != HAL_OK) {
  8000786:	4818      	ldr	r0, [pc, #96]	@ (80007e8 <MX_TIM4_Init+0xe4>)
  8000788:	f002 fea6 	bl	80034d8 <HAL_TIM_PWM_Init>
  800078c:	4603      	mov	r3, r0
  800078e:	2b00      	cmp	r3, #0
  8000790:	d001      	beq.n	8000796 <MX_TIM4_Init+0x92>
-  {
-    Error_Handler();
+		Error_Handler();
  8000792:	f000 fa4b 	bl	8000c2c <Error_Handler>
-  }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+	}
+	sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
  8000796:	2300      	movs	r3, #0
  8000798:	623b      	str	r3, [r7, #32]
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
  800079a:	2300      	movs	r3, #0
  800079c:	627b      	str	r3, [r7, #36]	@ 0x24
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK)
+	if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig)
  800079e:	f107 0320 	add.w	r3, r7, #32
  80007a2:	4619      	mov	r1, r3
  80007a4:	4810      	ldr	r0, [pc, #64]	@ (80007e8 <MX_TIM4_Init+0xe4>)
@@ -856,23 +850,23 @@ static void MX_TIM4_Init(void)
  80007aa:	4603      	mov	r3, r0
  80007ac:	2b00      	cmp	r3, #0
  80007ae:	d001      	beq.n	80007b4 <MX_TIM4_Init+0xb0>
-  {
-    Error_Handler();
+			!= HAL_OK) {
+		Error_Handler();
  80007b0:	f000 fa3c 	bl	8000c2c <Error_Handler>
-  }
-  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+	}
+	sConfigOC.OCMode = TIM_OCMODE_PWM1;
  80007b4:	2360      	movs	r3, #96	@ 0x60
  80007b6:	607b      	str	r3, [r7, #4]
-  sConfigOC.Pulse = 0;
+	sConfigOC.Pulse = 0;
  80007b8:	2300      	movs	r3, #0
  80007ba:	60bb      	str	r3, [r7, #8]
-  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+	sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
  80007bc:	2300      	movs	r3, #0
  80007be:	60fb      	str	r3, [r7, #12]
-  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
  80007c0:	2300      	movs	r3, #0
  80007c2:	617b      	str	r3, [r7, #20]
-  if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
+	if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_4)
  80007c4:	1d3b      	adds	r3, r7, #4
  80007c6:	220c      	movs	r2, #12
  80007c8:	4619      	mov	r1, r3
@@ -881,14 +875,14 @@ static void MX_TIM4_Init(void)
  80007d0:	4603      	mov	r3, r0
  80007d2:	2b00      	cmp	r3, #0
  80007d4:	d001      	beq.n	80007da <MX_TIM4_Init+0xd6>
-  {
-    Error_Handler();
+			!= HAL_OK) {
+		Error_Handler();
  80007d6:	f000 fa29 	bl	8000c2c <Error_Handler>
-  }
-  /* USER CODE BEGIN TIM4_Init 2 */
+	}
+	/* USER CODE BEGIN TIM4_Init 2 */
 
-  /* USER CODE END TIM4_Init 2 */
-  HAL_TIM_MspPostInit(&htim4);
+	/* USER CODE END TIM4_Init 2 */
+	HAL_TIM_MspPostInit(&htim4);
  80007da:	4803      	ldr	r0, [pc, #12]	@ (80007e8 <MX_TIM4_Init+0xe4>)
  80007dc:	f000 fa8c 	bl	8000cf8 <HAL_TIM_MspPostInit>
 
@@ -901,66 +895,65 @@ static void MX_TIM4_Init(void)
  80007ec:	40000800 	.word	0x40000800
 
 080007f0 <MX_TIM7_Init>:
-  * @brief TIM7 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_TIM7_Init(void)
-{
+/**
+ * @brief TIM7 Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_TIM7_Init(void) {
  80007f0:	b580      	push	{r7, lr}
  80007f2:	b082      	sub	sp, #8
  80007f4:	af00      	add	r7, sp, #0
 
-  /* USER CODE BEGIN TIM7_Init 0 */
+	/* USER CODE BEGIN TIM7_Init 0 */
 
-  /* USER CODE END TIM7_Init 0 */
+	/* USER CODE END TIM7_Init 0 */
 
-  TIM_MasterConfigTypeDef sMasterConfig = {0};
+	TIM_MasterConfigTypeDef sMasterConfig = { 0 };
  80007f6:	463b      	mov	r3, r7
  80007f8:	2200      	movs	r2, #0
  80007fa:	601a      	str	r2, [r3, #0]
  80007fc:	605a      	str	r2, [r3, #4]
 
-  /* USER CODE BEGIN TIM7_Init 1 */
+	/* USER CODE BEGIN TIM7_Init 1 */
 
-  /* USER CODE END TIM7_Init 1 */
-  htim7.Instance = TIM7;
+	/* USER CODE END TIM7_Init 1 */
+	htim7.Instance = TIM7;
  80007fe:	4b15      	ldr	r3, [pc, #84]	@ (8000854 <MX_TIM7_Init+0x64>)
  8000800:	4a15      	ldr	r2, [pc, #84]	@ (8000858 <MX_TIM7_Init+0x68>)
  8000802:	601a      	str	r2, [r3, #0]
-  htim7.Init.Prescaler = 74;
+	htim7.Init.Prescaler = 74;
  8000804:	4b13      	ldr	r3, [pc, #76]	@ (8000854 <MX_TIM7_Init+0x64>)
  8000806:	224a      	movs	r2, #74	@ 0x4a
  8000808:	605a      	str	r2, [r3, #4]
-  htim7.Init.CounterMode = TIM_COUNTERMODE_UP;
+	htim7.Init.CounterMode = TIM_COUNTERMODE_UP;
  800080a:	4b12      	ldr	r3, [pc, #72]	@ (8000854 <MX_TIM7_Init+0x64>)
  800080c:	2200      	movs	r2, #0
  800080e:	609a      	str	r2, [r3, #8]
-  htim7.Init.Period = 65535;
+	htim7.Init.Period = 65535;
  8000810:	4b10      	ldr	r3, [pc, #64]	@ (8000854 <MX_TIM7_Init+0x64>)
  8000812:	f64f 72ff 	movw	r2, #65535	@ 0xffff
  8000816:	60da      	str	r2, [r3, #12]
-  htim7.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+	htim7.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
  8000818:	4b0e      	ldr	r3, [pc, #56]	@ (8000854 <MX_TIM7_Init+0x64>)
  800081a:	2200      	movs	r2, #0
  800081c:	619a      	str	r2, [r3, #24]
-  if (HAL_TIM_Base_Init(&htim7) != HAL_OK)
+	if (HAL_TIM_Base_Init(&htim7) != HAL_OK) {
  800081e:	480d      	ldr	r0, [pc, #52]	@ (8000854 <MX_TIM7_Init+0x64>)
  8000820:	f002 fda2 	bl	8003368 <HAL_TIM_Base_Init>
  8000824:	4603      	mov	r3, r0
  8000826:	2b00      	cmp	r3, #0
  8000828:	d001      	beq.n	800082e <MX_TIM7_Init+0x3e>
-  {
-    Error_Handler();
+		Error_Handler();
  800082a:	f000 f9ff 	bl	8000c2c <Error_Handler>
-  }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+	}
+	sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
  800082e:	2300      	movs	r3, #0
  8000830:	603b      	str	r3, [r7, #0]
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
  8000832:	2300      	movs	r3, #0
  8000834:	607b      	str	r3, [r7, #4]
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim7, &sMasterConfig) != HAL_OK)
+	if (HAL_TIMEx_MasterConfigSynchronization(&htim7, &sMasterConfig)
  8000836:	463b      	mov	r3, r7
  8000838:	4619      	mov	r1, r3
  800083a:	4806      	ldr	r0, [pc, #24]	@ (8000854 <MX_TIM7_Init+0x64>)
@@ -968,13 +961,13 @@ static void MX_TIM7_Init(void)
  8000840:	4603      	mov	r3, r0
  8000842:	2b00      	cmp	r3, #0
  8000844:	d001      	beq.n	800084a <MX_TIM7_Init+0x5a>
-  {
-    Error_Handler();
+			!= HAL_OK) {
+		Error_Handler();
  8000846:	f000 f9f1 	bl	8000c2c <Error_Handler>
-  }
-  /* USER CODE BEGIN TIM7_Init 2 */
+	}
+	/* USER CODE BEGIN TIM7_Init 2 */
 
-  /* USER CODE END TIM7_Init 2 */
+	/* USER CODE END TIM7_Init 2 */
 
 }
  800084a:	bf00      	nop
@@ -986,64 +979,63 @@ static void MX_TIM7_Init(void)
  8000858:	40001400 	.word	0x40001400
 
 0800085c <MX_USART1_UART_Init>:
-  * @brief USART1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART1_UART_Init(void)
-{
+/**
+ * @brief USART1 Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_USART1_UART_Init(void) {
  800085c:	b580      	push	{r7, lr}
  800085e:	af00      	add	r7, sp, #0
-  /* USER CODE END USART1_Init 0 */
+	/* USER CODE END USART1_Init 0 */
 
-  /* USER CODE BEGIN USART1_Init 1 */
+	/* USER CODE BEGIN USART1_Init 1 */
 
-  /* USER CODE END USART1_Init 1 */
-  huart1.Instance = USART1;
+	/* USER CODE END USART1_Init 1 */
+	huart1.Instance = USART1;
  8000860:	4b11      	ldr	r3, [pc, #68]	@ (80008a8 <MX_USART1_UART_Init+0x4c>)
  8000862:	4a12      	ldr	r2, [pc, #72]	@ (80008ac <MX_USART1_UART_Init+0x50>)
  8000864:	601a      	str	r2, [r3, #0]
-  huart1.Init.BaudRate = 115200;
+	huart1.Init.BaudRate = 115200;
  8000866:	4b10      	ldr	r3, [pc, #64]	@ (80008a8 <MX_USART1_UART_Init+0x4c>)
  8000868:	f44f 32e1 	mov.w	r2, #115200	@ 0x1c200
  800086c:	605a      	str	r2, [r3, #4]
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+	huart1.Init.WordLength = UART_WORDLENGTH_8B;
  800086e:	4b0e      	ldr	r3, [pc, #56]	@ (80008a8 <MX_USART1_UART_Init+0x4c>)
  8000870:	2200      	movs	r2, #0
  8000872:	609a      	str	r2, [r3, #8]
-  huart1.Init.StopBits = UART_STOPBITS_1;
+	huart1.Init.StopBits = UART_STOPBITS_1;
  8000874:	4b0c      	ldr	r3, [pc, #48]	@ (80008a8 <MX_USART1_UART_Init+0x4c>)
  8000876:	2200      	movs	r2, #0
  8000878:	60da      	str	r2, [r3, #12]
-  huart1.Init.Parity = UART_PARITY_NONE;
+	huart1.Init.Parity = UART_PARITY_NONE;
  800087a:	4b0b      	ldr	r3, [pc, #44]	@ (80008a8 <MX_USART1_UART_Init+0x4c>)
  800087c:	2200      	movs	r2, #0
  800087e:	611a      	str	r2, [r3, #16]
-  huart1.Init.Mode = UART_MODE_TX_RX;
+	huart1.Init.Mode = UART_MODE_TX_RX;
  8000880:	4b09      	ldr	r3, [pc, #36]	@ (80008a8 <MX_USART1_UART_Init+0x4c>)
  8000882:	220c      	movs	r2, #12
  8000884:	615a      	str	r2, [r3, #20]
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
  8000886:	4b08      	ldr	r3, [pc, #32]	@ (80008a8 <MX_USART1_UART_Init+0x4c>)
  8000888:	2200      	movs	r2, #0
  800088a:	619a      	str	r2, [r3, #24]
-  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+	huart1.Init.OverSampling = UART_OVERSAMPLING_16;
  800088c:	4b06      	ldr	r3, [pc, #24]	@ (80008a8 <MX_USART1_UART_Init+0x4c>)
  800088e:	2200      	movs	r2, #0
  8000890:	61da      	str	r2, [r3, #28]
-  if (HAL_UART_Init(&huart1) != HAL_OK)
+	if (HAL_UART_Init(&huart1) != HAL_OK) {
  8000892:	4805      	ldr	r0, [pc, #20]	@ (80008a8 <MX_USART1_UART_Init+0x4c>)
  8000894:	f003 fcce 	bl	8004234 <HAL_UART_Init>
  8000898:	4603      	mov	r3, r0
  800089a:	2b00      	cmp	r3, #0
  800089c:	d001      	beq.n	80008a2 <MX_USART1_UART_Init+0x46>
-  {
-    Error_Handler();
+		Error_Handler();
  800089e:	f000 f9c5 	bl	8000c2c <Error_Handler>
-  }
-  /* USER CODE BEGIN USART1_Init 2 */
+	}
+	/* USER CODE BEGIN USART1_Init 2 */
 
-  /* USER CODE END USART1_Init 2 */
+	/* USER CODE END USART1_Init 2 */
 
 }
  80008a2:	bf00      	nop
@@ -1053,16 +1045,16 @@ static void MX_USART1_UART_Init(void)
  80008ac:	40011000 	.word	0x40011000
 
 080008b0 <MX_GPIO_Init>:
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_GPIO_Init(void)
-{
+/**
+ * @brief GPIO Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_GPIO_Init(void) {
  80008b0:	b580      	push	{r7, lr}
  80008b2:	b088      	sub	sp, #32
  80008b4:	af00      	add	r7, sp, #0
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
+	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
  80008b6:	f107 030c 	add.w	r3, r7, #12
  80008ba:	2200      	movs	r2, #0
  80008bc:	601a      	str	r2, [r3, #0]
@@ -1070,11 +1062,11 @@ static void MX_GPIO_Init(void)
  80008c0:	609a      	str	r2, [r3, #8]
  80008c2:	60da      	str	r2, [r3, #12]
  80008c4:	611a      	str	r2, [r3, #16]
-  /* USER CODE BEGIN MX_GPIO_Init_1 */
-  /* USER CODE END MX_GPIO_Init_1 */
+	/* USER CODE BEGIN MX_GPIO_Init_1 */
+	/* USER CODE END MX_GPIO_Init_1 */
 
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOH_CLK_ENABLE();
+	/* GPIO Ports Clock Enable */
+	__HAL_RCC_GPIOH_CLK_ENABLE();
  80008c6:	2300      	movs	r3, #0
  80008c8:	60bb      	str	r3, [r7, #8]
  80008ca:	4b26      	ldr	r3, [pc, #152]	@ (8000964 <MX_GPIO_Init+0xb4>)
@@ -1087,7 +1079,7 @@ static void MX_GPIO_Init(void)
  80008da:	f003 0380 	and.w	r3, r3, #128	@ 0x80
  80008de:	60bb      	str	r3, [r7, #8]
  80008e0:	68bb      	ldr	r3, [r7, #8]
-  __HAL_RCC_GPIOB_CLK_ENABLE();
+	__HAL_RCC_GPIOB_CLK_ENABLE();
  80008e2:	2300      	movs	r3, #0
  80008e4:	607b      	str	r3, [r7, #4]
  80008e6:	4b1f      	ldr	r3, [pc, #124]	@ (8000964 <MX_GPIO_Init+0xb4>)
@@ -1100,7 +1092,7 @@ static void MX_GPIO_Init(void)
  80008f6:	f003 0302 	and.w	r3, r3, #2
  80008fa:	607b      	str	r3, [r7, #4]
  80008fc:	687b      	ldr	r3, [r7, #4]
-  __HAL_RCC_GPIOA_CLK_ENABLE();
+	__HAL_RCC_GPIOA_CLK_ENABLE();
  80008fe:	2300      	movs	r3, #0
  8000900:	603b      	str	r3, [r7, #0]
  8000902:	4b18      	ldr	r3, [pc, #96]	@ (8000964 <MX_GPIO_Init+0xb4>)
@@ -1114,50 +1106,50 @@ static void MX_GPIO_Init(void)
  8000916:	603b      	str	r3, [r7, #0]
  8000918:	683b      	ldr	r3, [r7, #0]
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LED_CTRL_GPIO_Port, LED_CTRL_Pin, GPIO_PIN_RESET);
+	/*Configure GPIO pin Output Level */
+	HAL_GPIO_WritePin(LED_CTRL_GPIO_Port, LED_CTRL_Pin, GPIO_PIN_RESET);
  800091a:	2200      	movs	r2, #0
  800091c:	2101      	movs	r1, #1
  800091e:	4812      	ldr	r0, [pc, #72]	@ (8000968 <MX_GPIO_Init+0xb8>)
  8000920:	f000 fe5e 	bl	80015e0 <HAL_GPIO_WritePin>
 
-  /*Configure GPIO pin : LED_CTRL_Pin */
-  GPIO_InitStruct.Pin = LED_CTRL_Pin;
+	/*Configure GPIO pin : LED_CTRL_Pin */
+	GPIO_InitStruct.Pin = LED_CTRL_Pin;
  8000924:	2301      	movs	r3, #1
  8000926:	60fb      	str	r3, [r7, #12]
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
  8000928:	2301      	movs	r3, #1
  800092a:	613b      	str	r3, [r7, #16]
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
  800092c:	2300      	movs	r3, #0
  800092e:	617b      	str	r3, [r7, #20]
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
  8000930:	2300      	movs	r3, #0
  8000932:	61bb      	str	r3, [r7, #24]
-  HAL_GPIO_Init(LED_CTRL_GPIO_Port, &GPIO_InitStruct);
+	HAL_GPIO_Init(LED_CTRL_GPIO_Port, &GPIO_InitStruct);
  8000934:	f107 030c 	add.w	r3, r7, #12
  8000938:	4619      	mov	r1, r3
  800093a:	480b      	ldr	r0, [pc, #44]	@ (8000968 <MX_GPIO_Init+0xb8>)
  800093c:	f000 fc9c 	bl	8001278 <HAL_GPIO_Init>
 
-  /*Configure GPIO pin : TRIG_IN_Pin */
-  GPIO_InitStruct.Pin = TRIG_IN_Pin;
+	/*Configure GPIO pin : TRIG_IN_Pin */
+	GPIO_InitStruct.Pin = TRIG_IN_Pin;
  8000940:	f44f 7380 	mov.w	r3, #256	@ 0x100
  8000944:	60fb      	str	r3, [r7, #12]
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
  8000946:	2300      	movs	r3, #0
  8000948:	613b      	str	r3, [r7, #16]
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
  800094a:	2300      	movs	r3, #0
  800094c:	617b      	str	r3, [r7, #20]
-  HAL_GPIO_Init(TRIG_IN_GPIO_Port, &GPIO_InitStruct);
+	HAL_GPIO_Init(TRIG_IN_GPIO_Port, &GPIO_InitStruct);
  800094e:	f107 030c 	add.w	r3, r7, #12
  8000952:	4619      	mov	r1, r3
  8000954:	4805      	ldr	r0, [pc, #20]	@ (800096c <MX_GPIO_Init+0xbc>)
  8000956:	f000 fc8f 	bl	8001278 <HAL_GPIO_Init>
 
-  /* USER CODE BEGIN MX_GPIO_Init_2 */
-  /* USER CODE END MX_GPIO_Init_2 */
+	/* USER CODE BEGIN MX_GPIO_Init_2 */
+	/* USER CODE END MX_GPIO_Init_2 */
 }
  800095a:	bf00      	nop
  800095c:	3720      	adds	r7, #32
@@ -1172,44 +1164,43 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-
 // [기능 1] Device -> Host 상태 응답 전송 (14 Bytes)
 void Send_Status_Response() {
  8000970:	b580      	push	{r7, lr}
  8000972:	b084      	sub	sp, #16
  8000974:	af00      	add	r7, sp, #0
-    uint8_t packet[14];
+	uint8_t packet[14];
 
-    // [0] SOP
-    packet[0] = SOP;
+	// [0] SOP
+	packet[0] = SOP;
  8000976:	231c      	movs	r3, #28
  8000978:	703b      	strb	r3, [r7, #0]
-    // [1] ID ('h')
-    packet[1] = CMD_HEARTBEAT;
+	// [1] ID ('h')
+	packet[1] = CMD_HEARTBEAT;
  800097a:	2368      	movs	r3, #104	@ 0x68
  800097c:	707b      	strb	r3, [r7, #1]
-    // [2] Freq (+0x20 인코딩)
-    packet[2] = photic.freq_hz + 0x20;
+	// [2] Freq (+0x20 인코딩)
+	packet[2] = photic.freq_hz + 0x20;
  800097e:	4b29      	ldr	r3, [pc, #164]	@ (8000a24 <Send_Status_Response+0xb4>)
  8000980:	685b      	ldr	r3, [r3, #4]
  8000982:	b2db      	uxtb	r3, r3
  8000984:	3320      	adds	r3, #32
  8000986:	b2db      	uxtb	r3, r3
  8000988:	70bb      	strb	r3, [r7, #2]
-    // [3] Duration (고정 0x20)
-    packet[3] = 0x20;
+	// [3] Duration (고정 0x20)
+	packet[3] = 0x20;
  800098a:	2320      	movs	r3, #32
  800098c:	70fb      	strb	r3, [r7, #3]
-    // [4] Intensity (+0x20)
-    packet[4] = photic.intensity + 0x20;
+	// [4] Intensity (+0x20)
+	packet[4] = photic.intensity + 0x20;
  800098e:	4b25      	ldr	r3, [pc, #148]	@ (8000a24 <Send_Status_Response+0xb4>)
  8000990:	689b      	ldr	r3, [r3, #8]
  8000992:	b2db      	uxtb	r3, r3
  8000994:	3320      	adds	r3, #32
  8000996:	b2db      	uxtb	r3, r3
  8000998:	713b      	strb	r3, [r7, #4]
-    // [5] Flash Duration (+0x20)
-    packet[5] = photic.flash_duration + 0x20;
+	// [5] Flash Duration (+0x20)
+	packet[5] = photic.flash_duration + 0x20;
  800099a:	4b22      	ldr	r3, [pc, #136]	@ (8000a24 <Send_Status_Response+0xb4>)
  800099c:	68db      	ldr	r3, [r3, #12]
  800099e:	b2db      	uxtb	r3, r3
@@ -1217,40 +1208,43 @@ void Send_Status_Response() {
  80009a2:	b2db      	uxtb	r3, r3
  80009a4:	717b      	strb	r3, [r7, #5]
 
-    // [6] Status Flags
-    // Bit 0: Active, Bit 1: Standby, Bit 2: Force Stop, Bit 3: Error
-    uint8_t status = 0;
+	// [6] Status Flags
+	// Bit 0: Active, Bit 1: Standby, Bit 2: Force Stop, Bit 3: Error
+	uint8_t status = 0;
  80009a6:	2300      	movs	r3, #0
  80009a8:	73fb      	strb	r3, [r7, #15]
-    if (photic.is_running) status |= (1 << 0); // Active
+	if (photic.is_running)
  80009aa:	4b1e      	ldr	r3, [pc, #120]	@ (8000a24 <Send_Status_Response+0xb4>)
  80009ac:	781b      	ldrb	r3, [r3, #0]
  80009ae:	2b00      	cmp	r3, #0
  80009b0:	d004      	beq.n	80009bc <Send_Status_Response+0x4c>
+		status |= (1 << 0); // Active
  80009b2:	7bfb      	ldrb	r3, [r7, #15]
  80009b4:	f043 0301 	orr.w	r3, r3, #1
  80009b8:	73fb      	strb	r3, [r7, #15]
  80009ba:	e003      	b.n	80009c4 <Send_Status_Response+0x54>
-    else status |= (1 << 1);                   // Standby
+	else
+		status |= (1 << 1);                   // Standby
  80009bc:	7bfb      	ldrb	r3, [r7, #15]
  80009be:	f043 0302 	orr.w	r3, r3, #2
  80009c2:	73fb      	strb	r3, [r7, #15]
 
-    if (photic.error_code != 0) status |= (1 << 3); // Error Present
+	if (photic.error_code != 0)
  80009c4:	4b17      	ldr	r3, [pc, #92]	@ (8000a24 <Send_Status_Response+0xb4>)
  80009c6:	f893 3021 	ldrb.w	r3, [r3, #33]	@ 0x21
  80009ca:	2b00      	cmp	r3, #0
  80009cc:	d003      	beq.n	80009d6 <Send_Status_Response+0x66>
+		status |= (1 << 3); // Error Present
  80009ce:	7bfb      	ldrb	r3, [r7, #15]
  80009d0:	f043 0308 	orr.w	r3, r3, #8
  80009d4:	73fb      	strb	r3, [r7, #15]
-    packet[6] = status;
+	packet[6] = status;
  80009d6:	7bfb      	ldrb	r3, [r7, #15]
  80009d8:	71bb      	strb	r3, [r7, #6]
 
-    // [7] External Trigger (PA8 상태 읽기)
-    // PA8이 High면 1, Low면 0
-    photic.ext_trig_state = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8);
+	// [7] External Trigger (PA8 상태 읽기)
+	// PA8이 High면 1, Low면 0
+	photic.ext_trig_state = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8);
  80009da:	f44f 7180 	mov.w	r1, #256	@ 0x100
  80009de:	4812      	ldr	r0, [pc, #72]	@ (8000a28 <Send_Status_Response+0xb8>)
  80009e0:	f000 fde6 	bl	80015b0 <HAL_GPIO_ReadPin>
@@ -1258,38 +1252,40 @@ void Send_Status_Response() {
  80009e6:	461a      	mov	r2, r3
  80009e8:	4b0e      	ldr	r3, [pc, #56]	@ (8000a24 <Send_Status_Response+0xb4>)
  80009ea:	f883 2022 	strb.w	r2, [r3, #34]	@ 0x22
-    packet[7] = photic.ext_trig_state;
+	packet[7] = photic.ext_trig_state;
  80009ee:	4b0d      	ldr	r3, [pc, #52]	@ (8000a24 <Send_Status_Response+0xb4>)
  80009f0:	f893 3022 	ldrb.w	r3, [r3, #34]	@ 0x22
  80009f4:	71fb      	strb	r3, [r7, #7]
 
-    // [8] Error Code
-    packet[8] = photic.error_code;
+	// [8] Error Code
+	packet[8] = photic.error_code;
  80009f6:	4b0b      	ldr	r3, [pc, #44]	@ (8000a24 <Send_Status_Response+0xb4>)
  80009f8:	f893 3021 	ldrb.w	r3, [r3, #33]	@ 0x21
  80009fc:	723b      	strb	r3, [r7, #8]
 
-    // [9] SW Version (예: 1.0 -> 0x10)
-    packet[9] = 0x10;
+	// [9] SW Version (예: 1.0 -> 0x10)
+	packet[9] = 0x10;
  80009fe:	2310      	movs	r3, #16
  8000a00:	727b      	strb	r3, [r7, #9]
 
-    // [10~12] Spare
-    packet[10] = 0; packet[11] = 0; packet[12] = 0;
+	// [10~12] Spare
+	packet[10] = 0;
  8000a02:	2300      	movs	r3, #0
  8000a04:	72bb      	strb	r3, [r7, #10]
+	packet[11] = 0;
  8000a06:	2300      	movs	r3, #0
  8000a08:	72fb      	strb	r3, [r7, #11]
+	packet[12] = 0;
  8000a0a:	2300      	movs	r3, #0
  8000a0c:	733b      	strb	r3, [r7, #12]
 
-    // [13] EOP
-    packet[13] = EOP;
+	// [13] EOP
+	packet[13] = EOP;
  8000a0e:	230d      	movs	r3, #13
  8000a10:	737b      	strb	r3, [r7, #13]
 
-    // 전송!
-    CDC_Transmit_FS(packet, 14);
+	// 전송!
+	CDC_Transmit_FS(packet, 14);
  8000a12:	463b      	mov	r3, r7
  8000a14:	210e      	movs	r1, #14
  8000a16:	4618      	mov	r0, r3
@@ -1305,13 +1301,13 @@ void Send_Status_Response() {
 08000a2c <Parse_Heartbeat_Packet>:
 
 // [기능 2] Host 패킷 해석 (Parsing) 및 제어
-void Parse_Heartbeat_Packet(uint8_t* data) {
+void Parse_Heartbeat_Packet(uint8_t *data) {
  8000a2c:	b580      	push	{r7, lr}
  8000a2e:	b086      	sub	sp, #24
  8000a30:	af00      	add	r7, sp, #0
  8000a32:	6078      	str	r0, [r7, #4]
-    // 1. 유효성 검사 (SOP, EOP 확인)
-    if (data[0] != SOP || data[1] != CMD_HEARTBEAT || data[11] != EOP) return;
+	// 1. 유효성 검사 (SOP, EOP 확인)
+	if (data[0] != SOP || data[1] != CMD_HEARTBEAT || data[11] != EOP)
  8000a34:	687b      	ldr	r3, [r7, #4]
  8000a36:	781b      	ldrb	r3, [r3, #0]
  8000a38:	2b1c      	cmp	r3, #28
@@ -1326,101 +1322,102 @@ void Parse_Heartbeat_Packet(uint8_t* data) {
  8000a4e:	781b      	ldrb	r3, [r3, #0]
  8000a50:	2b0d      	cmp	r3, #13
  8000a52:	f040 808d 	bne.w	8000b70 <Parse_Heartbeat_Packet+0x144>
+		return;
 
-    // 2. Heartbeat 수신 인정 (타임아웃 리셋)
-    last_hb_received_tick = HAL_GetTick();
+	// 2. Heartbeat 수신 인정 (타임아웃 리셋)
+	last_hb_received_tick = HAL_GetTick();
  8000a56:	f000 facd 	bl	8000ff4 <HAL_GetTick>
  8000a5a:	4603      	mov	r3, r0
  8000a5c:	4a46      	ldr	r2, [pc, #280]	@ (8000b78 <Parse_Heartbeat_Packet+0x14c>)
  8000a5e:	6013      	str	r3, [r2, #0]
-    if (photic.error_code == 1) photic.error_code = 0; // 타임아웃 에러 해제
+	if (photic.error_code == 1)
  8000a60:	4b46      	ldr	r3, [pc, #280]	@ (8000b7c <Parse_Heartbeat_Packet+0x150>)
  8000a62:	f893 3021 	ldrb.w	r3, [r3, #33]	@ 0x21
  8000a66:	2b01      	cmp	r3, #1
  8000a68:	d103      	bne.n	8000a72 <Parse_Heartbeat_Packet+0x46>
+		photic.error_code = 0; // 타임아웃 에러 해제
  8000a6a:	4b44      	ldr	r3, [pc, #272]	@ (8000b7c <Parse_Heartbeat_Packet+0x150>)
  8000a6c:	2200      	movs	r2, #0
  8000a6e:	f883 2021 	strb.w	r2, [r3, #33]	@ 0x21
-    // 3. 제어 플래그 확인
-        uint8_t ctrl_flag = data[6];
+	// 3. 제어 플래그 확인
+	uint8_t ctrl_flag = data[6];
  8000a72:	687b      	ldr	r3, [r7, #4]
  8000a74:	799b      	ldrb	r3, [r3, #6]
  8000a76:	75fb      	strb	r3, [r7, #23]
-        uint8_t force_stop = (ctrl_flag >> 1) & 0x01;
+	uint8_t force_stop = (ctrl_flag >> 1) & 0x01;
  8000a78:	7dfb      	ldrb	r3, [r7, #23]
  8000a7a:	085b      	lsrs	r3, r3, #1
  8000a7c:	b2db      	uxtb	r3, r3
  8000a7e:	f003 0301 	and.w	r3, r3, #1
  8000a82:	75bb      	strb	r3, [r7, #22]
-        uint8_t enable = (ctrl_flag >> 0) & 0x01;
+	uint8_t enable = (ctrl_flag >> 0) & 0x01;
  8000a84:	7dfb      	ldrb	r3, [r7, #23]
  8000a86:	f003 0301 	and.w	r3, r3, #1
  8000a8a:	757b      	strb	r3, [r7, #21]
 
-        if (force_stop) {
+	if (force_stop) {
  8000a8c:	7dbb      	ldrb	r3, [r7, #22]
  8000a8e:	2b00      	cmp	r3, #0
  8000a90:	d007      	beq.n	8000aa2 <Parse_Heartbeat_Packet+0x76>
-            photic.is_running = 0;
+		photic.is_running = 0;
  8000a92:	4b3a      	ldr	r3, [pc, #232]	@ (8000b7c <Parse_Heartbeat_Packet+0x150>)
  8000a94:	2200      	movs	r2, #0
  8000a96:	701a      	strb	r2, [r3, #0]
-            HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);
+		HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);
  8000a98:	210c      	movs	r1, #12
  8000a9a:	4839      	ldr	r0, [pc, #228]	@ (8000b80 <Parse_Heartbeat_Packet+0x154>)
  8000a9c:	f002 fe3e 	bl	800371c <HAL_TIM_PWM_Stop>
  8000aa0:	e063      	b.n	8000b6a <Parse_Heartbeat_Packet+0x13e>
-        }
-        else if (enable) {
+	} else if (enable) {
  8000aa2:	7d7b      	ldrb	r3, [r7, #21]
  8000aa4:	2b00      	cmp	r3, #0
  8000aa6:	d059      	beq.n	8000b5c <Parse_Heartbeat_Packet+0x130>
-            // [수정된 부분] 동작 설정 업데이트
-            uint32_t new_freq = data[2] - 0x20;
+		// [수정된 부분] 동작 설정 업데이트
+		uint32_t new_freq = data[2] - 0x20;
  8000aa8:	687b      	ldr	r3, [r7, #4]
  8000aaa:	3302      	adds	r3, #2
  8000aac:	781b      	ldrb	r3, [r3, #0]
  8000aae:	3b20      	subs	r3, #32
  8000ab0:	613b      	str	r3, [r7, #16]
-            uint32_t new_intensity = data[4] - 0x20; // 1 ~ 10 값
+		uint32_t new_intensity = data[4] - 0x20; // 1 ~ 10 값
  8000ab2:	687b      	ldr	r3, [r7, #4]
  8000ab4:	3304      	adds	r3, #4
  8000ab6:	781b      	ldrb	r3, [r3, #0]
  8000ab8:	3b20      	subs	r3, #32
  8000aba:	60fb      	str	r3, [r7, #12]
-            uint32_t new_flash = data[5] - 0x20;
+		uint32_t new_flash = data[5] - 0x20;
  8000abc:	687b      	ldr	r3, [r7, #4]
  8000abe:	3305      	adds	r3, #5
  8000ac0:	781b      	ldrb	r3, [r3, #0]
  8000ac2:	3b20      	subs	r3, #32
  8000ac4:	60bb      	str	r3, [r7, #8]
 
-            // 값 업데이트
-            photic.freq_hz = new_freq;
+		// 값 업데이트
+		photic.freq_hz = new_freq;
  8000ac6:	4a2d      	ldr	r2, [pc, #180]	@ (8000b7c <Parse_Heartbeat_Packet+0x150>)
  8000ac8:	693b      	ldr	r3, [r7, #16]
  8000aca:	6053      	str	r3, [r2, #4]
-            photic.flash_duration = new_flash;
+		photic.flash_duration = new_flash;
  8000acc:	4a2b      	ldr	r2, [pc, #172]	@ (8000b7c <Parse_Heartbeat_Packet+0x150>)
  8000ace:	68bb      	ldr	r3, [r7, #8]
  8000ad0:	60d3      	str	r3, [r2, #12]
 
-            // ★★★ 여기서 실제 밝기 적용! ★★★
-            // 값이 바뀌었을 때만 함수를 호출해서 CPU 낭비를 줄입니다.
-            if (photic.intensity != new_intensity) {
+		// ★★★ 여기서 실제 밝기 적용! ★★★
+		// 값이 바뀌었을 때만 함수를 호출해서 CPU 낭비를 줄입니다.
+		if (photic.intensity != new_intensity) {
  8000ad2:	4b2a      	ldr	r3, [pc, #168]	@ (8000b7c <Parse_Heartbeat_Packet+0x150>)
  8000ad4:	689b      	ldr	r3, [r3, #8]
  8000ad6:	68fa      	ldr	r2, [r7, #12]
  8000ad8:	429a      	cmp	r2, r3
  8000ada:	d00b      	beq.n	8000af4 <Parse_Heartbeat_Packet+0xc8>
-                photic.intensity = new_intensity;
+			photic.intensity = new_intensity;
  8000adc:	4a27      	ldr	r2, [pc, #156]	@ (8000b7c <Parse_Heartbeat_Packet+0x150>)
  8000ade:	68fb      	ldr	r3, [r7, #12]
  8000ae0:	6093      	str	r3, [r2, #8]
 
-                // Protocol(1~10) -> PWM(10~100%) 변환
-                // 예: 5 -> 50%
-                LED_Set_Brightness_10kHz(photic.intensity * 10);
+			// Protocol(1~10) -> PWM(10~100%) 변환
+			// 예: 5 -> 50%
+			LED_Set_Brightness_10kHz(photic.intensity * 10);
  8000ae2:	4b26      	ldr	r3, [pc, #152]	@ (8000b7c <Parse_Heartbeat_Packet+0x150>)
  8000ae4:	689a      	ldr	r2, [r3, #8]
  8000ae6:	4613      	mov	r3, r2
@@ -1429,14 +1426,15 @@ void Parse_Heartbeat_Packet(uint8_t* data) {
  8000aec:	005b      	lsls	r3, r3, #1
  8000aee:	4618      	mov	r0, r3
  8000af0:	f7ff fd00 	bl	80004f4 <LED_Set_Brightness_10kHz>
-            }
+		}
 
-            // 주기 재계산
-            if (photic.freq_hz > 0) photic.period_ms = 1000 / photic.freq_hz;
+		// 주기 재계산
+		if (photic.freq_hz > 0)
  8000af4:	4b21      	ldr	r3, [pc, #132]	@ (8000b7c <Parse_Heartbeat_Packet+0x150>)
  8000af6:	685b      	ldr	r3, [r3, #4]
  8000af8:	2b00      	cmp	r3, #0
  8000afa:	d008      	beq.n	8000b0e <Parse_Heartbeat_Packet+0xe2>
+			photic.period_ms = 1000 / photic.freq_hz;
  8000afc:	4b1f      	ldr	r3, [pc, #124]	@ (8000b7c <Parse_Heartbeat_Packet+0x150>)
  8000afe:	685b      	ldr	r3, [r3, #4]
  8000b00:	f44f 727a 	mov.w	r2, #1000	@ 0x3e8
@@ -1444,34 +1442,35 @@ void Parse_Heartbeat_Packet(uint8_t* data) {
  8000b08:	4a1c      	ldr	r2, [pc, #112]	@ (8000b7c <Parse_Heartbeat_Packet+0x150>)
  8000b0a:	61d3      	str	r3, [r2, #28]
  8000b0c:	e003      	b.n	8000b16 <Parse_Heartbeat_Packet+0xea>
-            else photic.period_ms = 1000;
+		else
+			photic.period_ms = 1000;
  8000b0e:	4b1b      	ldr	r3, [pc, #108]	@ (8000b7c <Parse_Heartbeat_Packet+0x150>)
  8000b10:	f44f 727a 	mov.w	r2, #1000	@ 0x3e8
  8000b14:	61da      	str	r2, [r3, #28]
 
-            // 시작 플래그가 꺼져 있었다면 시작
-            if (photic.is_running == 0) {
+		// 시작 플래그가 꺼져 있었다면 시작
+		if (photic.is_running == 0) {
  8000b16:	4b19      	ldr	r3, [pc, #100]	@ (8000b7c <Parse_Heartbeat_Packet+0x150>)
  8000b18:	781b      	ldrb	r3, [r3, #0]
  8000b1a:	2b00      	cmp	r3, #0
  8000b1c:	d125      	bne.n	8000b6a <Parse_Heartbeat_Packet+0x13e>
-                 photic.is_running = 1;
+			photic.is_running = 1;
  8000b1e:	4b17      	ldr	r3, [pc, #92]	@ (8000b7c <Parse_Heartbeat_Packet+0x150>)
  8000b20:	2201      	movs	r2, #1
  8000b22:	701a      	strb	r2, [r3, #0]
-                 photic.start_tick = HAL_GetTick();
+			photic.start_tick = HAL_GetTick();
  8000b24:	f000 fa66 	bl	8000ff4 <HAL_GetTick>
  8000b28:	4603      	mov	r3, r0
  8000b2a:	4a14      	ldr	r2, [pc, #80]	@ (8000b7c <Parse_Heartbeat_Packet+0x150>)
  8000b2c:	6113      	str	r3, [r2, #16]
-                 photic.last_toggle_tick = HAL_GetTick();
+			photic.last_toggle_tick = HAL_GetTick();
  8000b2e:	f000 fa61 	bl	8000ff4 <HAL_GetTick>
  8000b32:	4603      	mov	r3, r0
  8000b34:	4a11      	ldr	r2, [pc, #68]	@ (8000b7c <Parse_Heartbeat_Packet+0x150>)
  8000b36:	6193      	str	r3, [r2, #24]
 
-                 // 시작할 때도 현재 밝기로 확실하게 세팅하고 켬
-                 LED_Set_Brightness_10kHz(photic.intensity * 10);
+			// 시작할 때도 현재 밝기로 확실하게 세팅하고 켬
+			LED_Set_Brightness_10kHz(photic.intensity * 10);
  8000b38:	4b10      	ldr	r3, [pc, #64]	@ (8000b7c <Parse_Heartbeat_Packet+0x150>)
  8000b3a:	689a      	ldr	r2, [r3, #8]
  8000b3c:	4613      	mov	r3, r2
@@ -1480,34 +1479,33 @@ void Parse_Heartbeat_Packet(uint8_t* data) {
  8000b42:	005b      	lsls	r3, r3, #1
  8000b44:	4618      	mov	r0, r3
  8000b46:	f7ff fcd5 	bl	80004f4 <LED_Set_Brightness_10kHz>
-                 HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
+			HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
  8000b4a:	210c      	movs	r1, #12
  8000b4c:	480c      	ldr	r0, [pc, #48]	@ (8000b80 <Parse_Heartbeat_Packet+0x154>)
  8000b4e:	f002 fd1d 	bl	800358c <HAL_TIM_PWM_Start>
-                 photic.led_state = 1;
+			photic.led_state = 1;
  8000b52:	4b0a      	ldr	r3, [pc, #40]	@ (8000b7c <Parse_Heartbeat_Packet+0x150>)
  8000b54:	2201      	movs	r2, #1
  8000b56:	f883 2020 	strb.w	r2, [r3, #32]
  8000b5a:	e006      	b.n	8000b6a <Parse_Heartbeat_Packet+0x13e>
-            }
-        }
-        else {
-            // 일반 정지
-            photic.is_running = 0;
+		}
+	} else {
+		// 일반 정지
+		photic.is_running = 0;
  8000b5c:	4b07      	ldr	r3, [pc, #28]	@ (8000b7c <Parse_Heartbeat_Packet+0x150>)
  8000b5e:	2200      	movs	r2, #0
  8000b60:	701a      	strb	r2, [r3, #0]
-            HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);
+		HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);
  8000b62:	210c      	movs	r1, #12
  8000b64:	4806      	ldr	r0, [pc, #24]	@ (8000b80 <Parse_Heartbeat_Packet+0x154>)
  8000b66:	f002 fdd9 	bl	800371c <HAL_TIM_PWM_Stop>
-        }
+	}
 
-        // 4. 응답 전송 (그대로)
-        Send_Status_Response();
+	// 4. 응답 전송 (그대로)
+	Send_Status_Response();
  8000b6a:	f7ff ff01 	bl	8000970 <Send_Status_Response>
  8000b6e:	e000      	b.n	8000b72 <Parse_Heartbeat_Packet+0x146>
-    if (data[0] != SOP || data[1] != CMD_HEARTBEAT || data[11] != EOP) return;
+		return;
  8000b70:	bf00      	nop
 
 }
@@ -1525,24 +1523,25 @@ void Update_Photic_Sequence() {
  8000b84:	b580      	push	{r7, lr}
  8000b86:	b082      	sub	sp, #8
  8000b88:	af00      	add	r7, sp, #0
-    if (photic.is_running == 0) return;
+	if (photic.is_running == 0)
  8000b8a:	4b1a      	ldr	r3, [pc, #104]	@ (8000bf4 <Update_Photic_Sequence+0x70>)
  8000b8c:	781b      	ldrb	r3, [r3, #0]
  8000b8e:	2b00      	cmp	r3, #0
  8000b90:	d02c      	beq.n	8000bec <Update_Photic_Sequence+0x68>
+		return;
 
-    uint32_t current_tick = HAL_GetTick();
+	uint32_t current_tick = HAL_GetTick();
  8000b92:	f000 fa2f 	bl	8000ff4 <HAL_GetTick>
  8000b96:	6078      	str	r0, [r7, #4]
 
-    // 깜빡임 로직
-    if (photic.led_state == 1) { // 켜짐 상태
+	// 깜빡임 로직
+	if (photic.led_state == 1) { // 켜짐 상태
  8000b98:	4b16      	ldr	r3, [pc, #88]	@ (8000bf4 <Update_Photic_Sequence+0x70>)
  8000b9a:	f893 3020 	ldrb.w	r3, [r3, #32]
  8000b9e:	2b01      	cmp	r3, #1
  8000ba0:	d110      	bne.n	8000bc4 <Update_Photic_Sequence+0x40>
-        // 설정된 Flash Duration 만큼 켜짐
-        if (current_tick - photic.last_toggle_tick >= photic.flash_duration) {
+		// 설정된 Flash Duration 만큼 켜짐
+		if (current_tick - photic.last_toggle_tick >= photic.flash_duration) {
  8000ba2:	4b14      	ldr	r3, [pc, #80]	@ (8000bf4 <Update_Photic_Sequence+0x70>)
  8000ba4:	699b      	ldr	r3, [r3, #24]
  8000ba6:	687a      	ldr	r2, [r7, #4]
@@ -1551,19 +1550,19 @@ void Update_Photic_Sequence() {
  8000bac:	68db      	ldr	r3, [r3, #12]
  8000bae:	429a      	cmp	r2, r3
  8000bb0:	d31d      	bcc.n	8000bee <Update_Photic_Sequence+0x6a>
-            HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);
+			HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);
  8000bb2:	210c      	movs	r1, #12
  8000bb4:	4810      	ldr	r0, [pc, #64]	@ (8000bf8 <Update_Photic_Sequence+0x74>)
  8000bb6:	f002 fdb1 	bl	800371c <HAL_TIM_PWM_Stop>
-            photic.led_state = 0;
+			photic.led_state = 0;
  8000bba:	4b0e      	ldr	r3, [pc, #56]	@ (8000bf4 <Update_Photic_Sequence+0x70>)
  8000bbc:	2200      	movs	r2, #0
  8000bbe:	f883 2020 	strb.w	r2, [r3, #32]
  8000bc2:	e014      	b.n	8000bee <Update_Photic_Sequence+0x6a>
-            // last_toggle_tick은 갱신하지 않음 (주기 유지를 위해)
-        }
-    } else { // 꺼짐 상태
-        if (current_tick - photic.last_toggle_tick >= photic.period_ms) {
+			// last_toggle_tick은 갱신하지 않음 (주기 유지를 위해)
+		}
+	} else { // 꺼짐 상태
+		if (current_tick - photic.last_toggle_tick >= photic.period_ms) {
  8000bc4:	4b0b      	ldr	r3, [pc, #44]	@ (8000bf4 <Update_Photic_Sequence+0x70>)
  8000bc6:	699b      	ldr	r3, [r3, #24]
  8000bc8:	687a      	ldr	r2, [r7, #4]
@@ -1572,23 +1571,23 @@ void Update_Photic_Sequence() {
  8000bce:	69db      	ldr	r3, [r3, #28]
  8000bd0:	429a      	cmp	r2, r3
  8000bd2:	d30c      	bcc.n	8000bee <Update_Photic_Sequence+0x6a>
-            HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
+			HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
  8000bd4:	210c      	movs	r1, #12
  8000bd6:	4808      	ldr	r0, [pc, #32]	@ (8000bf8 <Update_Photic_Sequence+0x74>)
  8000bd8:	f002 fcd8 	bl	800358c <HAL_TIM_PWM_Start>
-            photic.led_state = 1;
+			photic.led_state = 1;
  8000bdc:	4b05      	ldr	r3, [pc, #20]	@ (8000bf4 <Update_Photic_Sequence+0x70>)
  8000bde:	2201      	movs	r2, #1
  8000be0:	f883 2020 	strb.w	r2, [r3, #32]
-            photic.last_toggle_tick = current_tick;
+			photic.last_toggle_tick = current_tick;
  8000be4:	4a03      	ldr	r2, [pc, #12]	@ (8000bf4 <Update_Photic_Sequence+0x70>)
  8000be6:	687b      	ldr	r3, [r7, #4]
  8000be8:	6193      	str	r3, [r2, #24]
  8000bea:	e000      	b.n	8000bee <Update_Photic_Sequence+0x6a>
-    if (photic.is_running == 0) return;
+		return;
  8000bec:	bf00      	nop
-        }
-    }
+		}
+	}
 }
  8000bee:	3708      	adds	r7, #8
  8000bf0:	46bd      	mov	sp, r7
@@ -1599,27 +1598,27 @@ void Update_Photic_Sequence() {
 08000bfc <USB_CDC_RxHandler>:
 
 // [기능 4] USB 수신 핸들러
-void USB_CDC_RxHandler(uint8_t* Buf, uint32_t Len) {
+void USB_CDC_RxHandler(uint8_t *Buf, uint32_t Len) {
  8000bfc:	b580      	push	{r7, lr}
  8000bfe:	b082      	sub	sp, #8
  8000c00:	af00      	add	r7, sp, #0
  8000c02:	6078      	str	r0, [r7, #4]
  8000c04:	6039      	str	r1, [r7, #0]
-    // 12바이트 패킷 복사
-    if (Len >= 12) {
+	// 12바이트 패킷 복사
+	if (Len >= 12) {
  8000c06:	683b      	ldr	r3, [r7, #0]
  8000c08:	2b0b      	cmp	r3, #11
  8000c0a:	d907      	bls.n	8000c1c <USB_CDC_RxHandler+0x20>
-        memcpy(rx_buffer, Buf, 12);
+		memcpy(rx_buffer, Buf, 12);
  8000c0c:	220c      	movs	r2, #12
  8000c0e:	6879      	ldr	r1, [r7, #4]
  8000c10:	4804      	ldr	r0, [pc, #16]	@ (8000c24 <USB_CDC_RxHandler+0x28>)
  8000c12:	f007 fe65 	bl	80088e0 <memcpy>
-        usb_data_received = 1; // 깃발 들기
+		usb_data_received = 1; // 깃발 들기
  8000c16:	4b04      	ldr	r3, [pc, #16]	@ (8000c28 <USB_CDC_RxHandler+0x2c>)
  8000c18:	2201      	movs	r2, #1
  8000c1a:	701a      	strb	r2, [r3, #0]
-    }
+	}
 }
  8000c1c:	bf00      	nop
  8000c1e:	3708      	adds	r7, #8
@@ -1629,12 +1628,12 @@ void USB_CDC_RxHandler(uint8_t* Buf, uint32_t Len) {
  8000c28:	200001f0 	.word	0x200001f0
 
 08000c2c <Error_Handler>:
+
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
-void Error_Handler(void)
-{
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
+void Error_Handler(void) {
  8000c2c:	b480      	push	{r7}
  8000c2e:	af00      	add	r7, sp, #0
   \details Disables IRQ interrupts by setting special-purpose register PRIMASK.
@@ -1646,10 +1645,10 @@ __STATIC_FORCEINLINE void __disable_irq(void)
  8000c30:	b672      	cpsid	i
 }
  8000c32:	bf00      	nop
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
+	/* USER CODE BEGIN Error_Handler_Debug */
+	/* User can add his own implementation to report the HAL error return state */
+	__disable_irq();
+	while (1) {
  8000c34:	bf00      	nop
  8000c36:	e7fd      	b.n	8000c34 <Error_Handler+0x8>
 
